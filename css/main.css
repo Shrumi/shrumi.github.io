@@ -20,7 +20,15 @@ p{
     letter-spacing: 1.2 em;
      
     }
-   
+   p.text {
+   	width: 180px;
+   	background-color: blue;
+   	color: #fff;
+   	font-size: 25px;
+
+   	line-height: 1.8 em;
+   	letter-spacing: 1.2 em;
+   }
 }
 p.new {
 	background: blue;
@@ -78,9 +86,9 @@ background-color: green;
  text-align: left !important;
 }
 
-.list {
+li {
 	font-size:  25px;
-	border: 5 px solid black;
+	border: 2px solid black;
 }
 
 .buttons {
