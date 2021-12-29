@@ -41,7 +41,7 @@ p {
 
 .header, .logo {
 
-	padding-top: 90px ;
+	padding-top: 53px ;
 }
 
 .wrapper {
@@ -53,7 +53,11 @@ p {
 	margin-top: 176px;
 	width: 490px;
 }
-
+.intro {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 16px;
+	line-height: 27px;
+}
 .title {
 	font-size: 36px;
 }
@@ -62,19 +66,19 @@ p {
 	color: #48ed8e;
 }
 
-.intro {
-	margin-bottom: 37px;
-	margin-top: 30px;
+.offer {
+	
+	margin-top: 90px;
 	width: 380px;
 }
 
 .btn {
 	font-family: 'Montserrat', sans-serif;
-	background: #ed9619;
-	color: #fff;
-	border-radius: 100px;
+	background: #ffd429;
+	color: #000;
+	font-size: 15px;
 	display: block;
-	width: 205px;
+	width: 222px;
 	padding: 19px 0;
 	text-align: center;
 	text-decoration: none;
