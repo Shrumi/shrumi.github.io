@@ -32,11 +32,13 @@ p {
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 400;
 	font-size: 16px;
+
 }
 .palm { background-color: #fff; }
 .container {
 	width: 1170px;
 	margin: 0 auto;
+	justify-content: space-between;
 }
 h2.forward {
 	font-family: 'Ubuntu', sans-serif;
@@ -50,7 +52,8 @@ h2.forward {
 
 .wrapper {
 	display: flex;
-	/*justify-content: space-between;*/
+	justify-content: space-between;
+	margin: 90px auto
 }
 
 .offer {
@@ -58,9 +61,19 @@ h2.forward {
 	width: 490px;
 }
 .intro {
-	font-family: 'Open Sans', sans-serif;
-	font-size: 16px;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 15px;
 	line-height: 27px;
+	color: #fff;
+	width: 390px;
+	
+}
+.desc {	font-family: 'Ubuntu', sans-serif;
+	font-size: 15px;
+	line-height: 27px;
+	color: #000;
+	
+	text-align: center;
 }
 .title {
 	font-size: 36px;
@@ -79,16 +92,28 @@ h2.forward {
 .btn {
 	font-family: 'Montserrat', sans-serif;
 	background: #ffd429;
-	color: #000;
 	font-size: 15px;
-	display: block;
+	color: #000;
+    display: block;
 	width: 222px;
 	padding: 19px 0;
 	text-align: center;
 	text-decoration: none;
 	transition: all 0.5s ease;
 }
+.btn2 {
 
+font-family: 'Montserrat', sans-serif;
+	background: #ffd429;
+	font-size: 15px;
+	color: #000;
+    display: block;
+	
+	padding: 19px 0;
+	text-align: center;
+	text-decoration: none;
+	transition: all 0.5s ease;
+	width:  300px;}
 .btn:hover {
 	background: #d9860e;
 }
@@ -142,17 +167,27 @@ h2.forward {
 }
 
 .form {
-	margin-top: 40px;
+	
+	    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-
-.input {
-	width: 474px;
-	border: 1px solid #bfb8d1;
+	.input {
+	    width: 340px;
+    
+    margin-bottom: 20px;
+    padding left: 20px;
+    border: 2px solid #999A9D;
+    font-family: 'Ubuntu', sans-serif;
 	font-size: 15px;
-	font-family: 'Open Sans', sans-serif;
-	border-radius: 100px;
-	height: 54px;
-	padding-left: 38px;
+	line-height: 27px;
+	color: #000;
+	width: 298px;
+	}
+.form2 {
+ text-align: left !important;
+ padding-left: 300px;
+ margin-right: 300px;
 }
 
 .btn-form {
@@ -164,7 +199,8 @@ h2.forward {
 
 .footer {
 	padding: 33px 0;
-	background: #201b2d;
+	background: #164d7a;
+	text-align: center;
 }
 
 .credits {
@@ -172,3 +208,20 @@ h2.forward {
 	font-size: 14px;
 	margin: 0;
 }
+.palm {background: #fff !important;
+padding-bottom: 90px;}
+.forward {
+	padding: 90px ;
+	text-align: center;}
+
+	p.free {
+		
+		display: flex;
+font-family: 'Ubuntu', sans-serif;
+	font-weight: 700;
+		color: #000 !important;
+		margin-left: 109px;
+	}
+	.icon {
+		margin-left: 164px;
+	}
