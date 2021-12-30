@@ -16,7 +16,7 @@ h1 {
 }
 p{
 	
-	margin: 30px auto;
+	
     
      
     }
@@ -36,7 +36,7 @@ p.new {
 	display: block;
 	width: 180px;
 	font-size: 25px;
-	
+	text-align: left;
 
 	}
  p span {color: red;
@@ -44,6 +44,10 @@ p.new {
     }
 .new span {
 	color: red;
+}
+ .wrapper {
+	display: flex;
+	/*justify-content: space-between;*/
 }
 
 h2 {
@@ -93,8 +97,8 @@ li {
 
 .buttons {
   text-align: center; /* центрируем элементы с display:inline-block; */
-margin: 0 auto;
-letter-spacing: 0.1em;
+margin: 0 ;
+
 }
 
 .buttonClass
@@ -117,7 +121,7 @@ letter-spacing: 0.1em;
     box-shadow: 0px 10px 14px -7px #276873;
     text-shadow: 0px 1px 0px #3d768a;
     background: linear-gradient(#599bb3, rgba(0, 222, 255, 1));
-  
+  letter-spacing: 0.1em;
     width: 343px;
     
     border-radius: 5px;
@@ -156,13 +160,13 @@ letter-spacing: 0.1em;
     box-shadow: 0px 10px 14px -7px #276873;
     text-shadow: 0px 1px 0px #3d768a;
     background: linear-gradient(#599bb3, rgba(0, 222, 255, 1));
-  
+  letter-spacing: 0.1em;
     width: 343px;
     margin-bottom: 17px;
     margin-right: 20px;
     border-radius: 5px;
     border: 1px solid #bbbbbb;
-   
+   text-decoration: none;
  
     font-family: 'Open Sans Regular', sans-serif;
     height: 58px;
