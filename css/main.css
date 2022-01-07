@@ -181,3 +181,6 @@ margin: 0 ;
 .buttonClass:hover {
   background: linear-gradient(rgba(0, 222, 255, 1), #599bb3);
 }
+.form2 {
+    margin-bottom: 30px;
+}
