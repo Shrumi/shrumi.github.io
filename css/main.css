@@ -4,6 +4,7 @@ body {
 }
 .logo {
     width:  293px;
+    height: 108px;;
 }
 div, p, form, .forma span, ul, .block, li,a {
 box-sizing: border-box;
