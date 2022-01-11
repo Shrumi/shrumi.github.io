@@ -18,12 +18,7 @@ h1 {
 	
 	color: red ;
 }
-p{
-	
-	
-    
-     
-    }
+
    p.text {
    	width: 180px;
    	background-color: blue;
@@ -32,7 +27,7 @@ p{
 
    	
    }
-}
+
 p.new {
 	background: blue;
 	color: #fff;
@@ -87,7 +82,7 @@ background-color: green;
 .block:hover {
    opacity: 0.5;
 	} 
-}
+
  .form2 {
  text-align: left !important;
  padding-left: 300px;
@@ -108,7 +103,7 @@ margin: 0 ;
 .buttonClass
 {
 
-;
+
     border-width: 1px
 ;
     color: #fff;
