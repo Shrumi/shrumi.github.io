@@ -1,3 +1,3 @@
 const div = document.getElementById ('div');
-div.className = 'div-green';
+div.classList.add('div-green');
 console.log (div); 
