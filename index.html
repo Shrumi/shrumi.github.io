@@ -162,13 +162,18 @@
 
     /* Туманность медленно пульсирует */
     .nebula__cloud {
-      animation: cloud-pulse 6s ease-in-out infinite;
+      animation: cloud-breathe 14s cubic-bezier(0.4, 0, 0.6, 1) infinite;
       transform-origin: 120px 320px;
     }
 
-    @keyframes cloud-pulse {
-      0%, 100% { opacity: 0.55; transform: scale(1); }
-      50%      { opacity: 0.9; transform: scale(1.25); }
+    /* Туманность дышит в такт орбите звёзд (14s): звёзды уходят —
+       облако разрастается и светлеет; вернулись — сжалось к точке старта */
+    @keyframes cloud-breathe {
+      0%   { opacity: 0.45; transform: scale(0.55); }
+      30%  { opacity: 0.9;  transform: scale(1.25); }
+      55%  { opacity: 0.75; transform: scale(1.05); }
+      80%  { opacity: 0.7;  transform: scale(0.95); }
+      100% { opacity: 0.45; transform: scale(0.55); }
     }
 
     /* Hero */
@@ -391,17 +396,7 @@
       color: var(--color-muted);
     }
 
-    /* Примеры выполненных работ */
-    .showcase {
-      padding-bottom: var(--space-section);
-    }
-
-    .showcase__grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      margin-top: 3rem;
-    }
-
+    /* Карточки-релизы внутри Портфолио (бывш. «Примеры работ») */
     .work-card--showcase {
       border-color: rgba(52, 211, 153, 0.25);
     }
@@ -420,14 +415,6 @@
 
     .showcase__link--cta:hover {
       color: #6ee7b7;
-    }
-
-    @media (max-width: 900px) {
-      .showcase__grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 640px) {
-      .showcase__grid { grid-template-columns: 1fr; }
     }
 
     /* CTA */
@@ -705,25 +692,6 @@
           <p class="showcase__cta-row"><a class="showcase__link showcase__link--cta" href="https://t.me/Shrumi" target="_blank" rel="noopener">Запросить демо →</a></p>
         </article>
 
-      </div>
-
-      <div class="portfolio__cta">
-        <a class="button" href="https://t.me/Shrumi" target="_blank" rel="noopener">
-          <svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M9.04 15.31l-.38 5.36c.54 0 .78-.23 1.06-.51l2.55-2.44 5.28 3.87c.97.53 1.65.25 1.92-.9L23.9 3.35c.31-1.42-.51-1.98-1.46-1.63L1.13 9.98c-1.39.54-1.37 1.32-.24 1.67l4.94 1.54L18.13 5.42c.54-.36 1.03-.16.63.2L9.04 15.31z"/>
-          </svg>
-          Обсудить проект
-        </a>
-        <p class="portfolio__cta-note">Расскажите о задаче — предложу решение и оценку.</p>
-      </div>
-    </section>
-
-    <section class="showcase" aria-label="Примеры выполненных работ">
-      <header>
-        <h2 class="portfolio__heading">Примеры выполненных работ</h2>
-      </header>
-
-      <div class="showcase__grid">
         <article class="work-card work-card--showcase" itemscope itemtype="https://schema.org/CreativeWork">
           <h3 class="work-card__title">
             <a class="showcase__link" href="https://shrumi.github.io/Osen/" target="_blank" rel="noopener" itemprop="url">
@@ -747,6 +715,7 @@
             <a class="showcase__link showcase__link--cta" href="https://github.com/Shrumi/suno-parser/releases/tag/v3.4.1" target="_blank" rel="noopener">Скачать для Windows</a>
           </p>
         </article>
+
         <article class="work-card work-card--showcase" itemscope itemtype="https://schema.org/SoftwareApplication">
           <h3 class="work-card__title" itemprop="name">Калькулятор прайса «ФОТОН»</h3>
           <p class="work-card__row" itemprop="description">Excel-калькулятор для администратора фото-салона: умный поиск услуг по двум буквам (без учёта регистра и раскладки), авторасчёт чека, клавиатурный ввод без мыши и отчёт по кассе смены (наличные/безнал/итог). Работает в Excel 2007+, осваивается за 5 минут.</p>
@@ -763,6 +732,17 @@
           <meta itemprop="applicationCategory" content="BusinessApplication">
           <link itemprop="downloadUrl" href="https://shrumi.github.io/files/photon-price-calculator.xlsm">
         </article>
+
+      </div>
+
+      <div class="portfolio__cta">
+        <a class="button" href="https://t.me/Shrumi" target="_blank" rel="noopener">
+          <svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M9.04 15.31l-.38 5.36c.54 0 .78-.23 1.06-.51l2.55-2.44 5.28 3.87c.97.53 1.65.25 1.92-.9L23.9 3.35c.31-1.42-.51-1.98-1.46-1.63L1.13 9.98c-1.39.54-1.37 1.32-.24 1.67l4.94 1.54L18.13 5.42c.54-.36 1.03-.16.63.2L9.04 15.31z"/>
+          </svg>
+          Обсудить проект
+        </a>
+        <p class="portfolio__cta-note">Расскажите о задаче — предложу решение и оценку.</p>
       </div>
     </section>
 
