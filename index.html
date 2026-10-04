@@ -163,7 +163,11 @@
     /* Туманность медленно пульсирует */
     .nebula__cloud {
       animation: cloud-breathe 14s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-      transform-origin: 120px 320px;
+      /* Круги облака стоят в локальном (0,0) группы .nebula — это и есть
+         точка старта пунктира (120, 320). fill-box привязывает центр
+         масштабирования к самому облаку: при сжатии стягивается туда. */
+      transform-box: fill-box;
+      transform-origin: center;
     }
 
     /* Туманность дышит в такт орбите звёзд (14s): звёзды уходят —
@@ -668,7 +672,8 @@
 
       <div class="portfolio__grid">
 
-        <article class="work-card">
+        <!-- Карточки-заглушки скрыты: снимите hidden, когда появятся реальные кейсы -->
+        <article class="work-card" hidden>
           <h3 class="work-card__title">Чат-бот поддержки на LLM</h3>
           <p class="work-card__row"><span class="work-card__label">Задача</span>Бот отвечал мимо: клиенты уходили к операторам.</p>
           <p class="work-card__row"><span class="work-card__label">Что сделал</span>Системный промпт, few-shot примеры, сценарии и валидация ответов.</p>
@@ -676,7 +681,7 @@
           <p class="showcase__cta-row"><a class="showcase__link showcase__link--cta" href="https://t.me/Shrumi" target="_blank" rel="noopener">Запросить демо →</a></p>
         </article>
 
-        <article class="work-card">
+        <article class="work-card" hidden>
           <h3 class="work-card__title">Автогенерация карточек товаров</h3>
           <p class="work-card__row"><span class="work-card__label">Задача</span>Маркетплейсу нужны были описания для сотен позиций.</p>
           <p class="work-card__row"><span class="work-card__label">Что сделал</span>Промпт-пайплайн: ввод характеристик → SEO-описание по шаблону бренда.</p>
@@ -684,7 +689,7 @@
           <p class="showcase__cta-row"><a class="showcase__link showcase__link--cta" href="https://t.me/Shrumi" target="_blank" rel="noopener">Запросить демо →</a></p>
         </article>
 
-        <article class="work-card">
+        <article class="work-card" hidden>
           <h3 class="work-card__title">Аудит промптов аналитиков</h3>
           <p class="work-card__row"><span class="work-card__label">Задача</span>Команда получала нестабильные ответы от модели на аналитических задачах.</p>
           <p class="work-card__row"><span class="work-card__label">Что сделал</span>Ревизия промптов, реструктуризация контекста, метрики качества.</p>
