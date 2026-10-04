@@ -115,6 +115,24 @@
       to { stroke-dashoffset: -600; }
     }
 
+    /* Пульс узлов нейросети: мягкое «сердцебиение» с фазовым сдвигом.
+       nth-of-type + :nth-child невозможны для inline-style задержек,
+       поэтому фазы через отдельные классы. */
+    .bg-art .node {
+      animation: node-pulse 5.2s ease-in-out infinite;
+      transform-origin: center;
+      transform-box: fill-box;
+    }
+
+    .bg-art .node--d1 { animation-delay: -0.8s; }
+    .bg-art .node--d2 { animation-delay: -1.6s; }
+    .bg-art .node--d3 { animation-delay: -2.4s; }
+
+    @keyframes node-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.55; }
+      50%      { transform: scale(1.6); opacity: 1; }
+    }
+
     /* Звёзды из туманности: слева у истока пунктирной линии (120, 320).
        Карусель по спирали: каждая звезда запаздывает на свою долю цикла —
        получается непрерывный поток рождений и возвратов.
@@ -524,6 +542,7 @@
       html { scroll-behavior: auto; }
       .hero__title,
       .bg-art .flow,
+      .bg-art .node,
       .made-with-ai span,
       .nebula__star,
       .nebula__cloud,
@@ -570,18 +589,18 @@
         <path d="M80 760 C 340 700, 620 820, 900 760 S 1280 700, 1420 780"/>
       </g>
       <g fill="#34d399" stroke="none" opacity="0.5">
-        <circle cx="720" cy="170" r="4"/>
-        <circle cx="340" cy="720" r="3"/>
-        <circle cx="1080" cy="680" r="4"/>
-        <circle cx="840" cy="360" r="3"/>
-        <circle cx="120" cy="320" r="3"/>
-        <circle cx="900" cy="760" r="3"/>
+        <circle class="node node--d1" cx="720" cy="170" r="4"/>
+        <circle class="node node--d2" cx="340" cy="720" r="3"/>
+        <circle class="node node--d3" cx="1080" cy="680" r="4"/>
+        <circle class="node" cx="840" cy="360" r="3"/>
+        <circle class="node node--d1" cx="120" cy="320" r="3"/>
+        <circle class="node node--d2" cx="900" cy="760" r="3"/>
       </g>
       <g fill="#a78bfa" stroke="none" opacity="0.45">
-        <circle cx="260" cy="120" r="3"/>
-        <circle cx="1240" cy="560" r="3"/>
-        <circle cx="160" cy="480" r="3"/>
-        <circle cx="1240" cy="300" r="3"/>
+        <circle class="node node--d3" cx="260" cy="120" r="3"/>
+        <circle class="node" cx="1240" cy="560" r="3"/>
+        <circle class="node node--d1" cx="160" cy="480" r="3"/>
+        <circle class="node node--d2" cx="1240" cy="300" r="3"/>
       </g>
     </g>
 
@@ -667,6 +686,7 @@
           <p class="work-card__row"><span class="work-card__label">Задача</span>Бот отвечал мимо: клиенты уходили к операторам.</p>
           <p class="work-card__row"><span class="work-card__label">Что сделал</span>Системный промпт, few-shot примеры, сценарии и валидация ответов.</p>
           <p class="work-card__row work-card__row--result"><span class="work-card__label">Результат</span><span class="work-card__result-value">90%</span> релевантных ответов без доработки оператором.</p>
+          <p class="showcase__cta-row"><a class="showcase__link showcase__link--cta" href="https://t.me/Shrumi" target="_blank" rel="noopener">Запросить демо →</a></p>
         </article>
 
         <article class="work-card">
@@ -674,6 +694,7 @@
           <p class="work-card__row"><span class="work-card__label">Задача</span>Маркетплейсу нужны были описания для сотен позиций.</p>
           <p class="work-card__row"><span class="work-card__label">Что сделал</span>Промпт-пайплайн: ввод характеристик → SEO-описание по шаблону бренда.</p>
           <p class="work-card__row work-card__row--result"><span class="work-card__label">Результат</span><span class="work-card__result-value">300+</span> карточек в неделю, −70% времени на контент.</p>
+          <p class="showcase__cta-row"><a class="showcase__link showcase__link--cta" href="https://t.me/Shrumi" target="_blank" rel="noopener">Запросить демо →</a></p>
         </article>
 
         <article class="work-card">
@@ -681,6 +702,7 @@
           <p class="work-card__row"><span class="work-card__label">Задача</span>Команда получала нестабильные ответы от модели на аналитических задачах.</p>
           <p class="work-card__row"><span class="work-card__label">Что сделал</span>Ревизия промптов, реструктуризация контекста, метрики качества.</p>
           <p class="work-card__row work-card__row--result"><span class="work-card__label">Результат</span><span class="work-card__result-value">+40%</span> корректных ответов на тестовом наборе.</p>
+          <p class="showcase__cta-row"><a class="showcase__link showcase__link--cta" href="https://t.me/Shrumi" target="_blank" rel="noopener">Запросить демо →</a></p>
         </article>
 
       </div>
@@ -724,6 +746,20 @@
           <p class="showcase__cta-row">
             <a class="showcase__link showcase__link--cta" href="https://github.com/Shrumi/suno-parser/releases/tag/v3.4.1" target="_blank" rel="noopener">Скачать для Windows</a>
           </p>
+        </article>
+        <article class="work-card work-card--showcase" itemscope itemtype="https://schema.org/SoftwareApplication">
+          <h3 class="work-card__title" itemprop="name">Калькулятор прайса «ФОТОН»</h3>
+          <p class="work-card__row" itemprop="description">Excel-калькулятор для администратора фото-салона: умный поиск услуг по двум буквам (без учёта регистра и раскладки), авторасчёт чека, клавиатурный ввод без мыши и отчёт по кассе смены (наличные/безнал/итог). Работает в Excel 2007+, осваивается за 5 минут.</p>
+          <p class="work-card__row work-card__row--result">
+            <span class="work-card__label">Результат</span>
+            Расчёт клиента ускорен на 40–60%, ошибки ручного счёта исключены.
+          </p>
+          <p class="showcase__cta-row">
+            <a class="showcase__link showcase__link--cta" href="files/photon-price-calculator.xlsm" download>Скачать для Excel (xlsm)</a>
+          </p>
+          <meta itemprop="operatingSystem" content="Windows, Excel 2007+">
+          <meta itemprop="applicationCategory" content="BusinessApplication">
+          <link itemprop="downloadUrl" href="https://shrumi.github.io/files/photon-price-calculator.xlsm">
         </article>
       </div>
     </section>
