@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Инструкция: Калькулятор прайса «ФОТОН» — Дмитрий Скородько</title>
+  <meta name="description" content="Инструкция к Excel-калькулятору прайса фото-салона «ФОТОН»: включение макросов, умный поиск услуг по двум буквам, оформление чека, кассовый отчёт смены. Excel 2007+.">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" type="image/png" href="../assets/favicon-256.png">
+  <style>
+    :root {
+      --color-bg: #0a0a14;
+      --color-text: #e7e9f0;
+      --color-muted: #a3a8b8;
+      --color-green: #34d399;
+      --color-violet: #7c3aed;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.65;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 6rem;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 2.5rem;
+      color: var(--color-green);
+      font-size: 0.95rem;
+      text-decoration-color: rgba(52, 211, 153, 0.4);
+      text-underline-offset: 3px;
+    }
+
+    .back:hover { color: #6ee7b7; }
+
+    h1 {
+      font-size: clamp(1.7rem, 4vw, 2.4rem);
+      line-height: 1.25;
+      margin: 0 0 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--color-muted);
+      font-size: 1.05rem;
+      margin: 0 0 3rem;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      margin: 2.75rem 0 0.9rem;
+      color: var(--color-green);
+    }
+
+    h3 { font-size: 1.05rem; margin: 1.8rem 0 0.5rem; }
+
+    p, li { color: var(--color-muted); font-size: 1rem; }
+
+    strong { color: var(--color-text); }
+
+    ol, ul { padding-left: 1.4rem; margin: 0.6rem 0; }
+
+    li { margin: 0.35rem 0; }
+
+    .steps {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 12px;
+      padding: 1.5rem 1.5rem 1.5rem 2.8rem;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .steps li { margin: 0.5rem 0; }
+
+    kbd {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 0.1em 0.5em;
+      font-family: inherit;
+      font-size: 0.9em;
+      color: var(--color-text);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid rgba(167, 139, 250, 0.15);
+      color: var(--color-muted);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--color-green);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .note {
+      border-left: 3px solid var(--color-violet);
+      padding: 0.6rem 1rem;
+      margin: 1rem 0;
+      color: var(--color-muted);
+      background: rgba(124, 58, 237, 0.08);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(90deg, #10b981, var(--color-violet));
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 8px;
+      box-shadow: 0 0 24px rgba(124, 58, 237, 0.4);
+    }
+
+    .cta { text-align: center; margin-top: 4rem; }
+
+    @media (max-width: 640px) {
+      .container { padding: 2.5rem 1.25rem 4rem; }
+      .steps { padding-left: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <a class="back" href="../index.html">← На главную</a>
+
+    <h1>Калькулятор прайса «ФОТОН»</h1>
+    <p class="subtitle">Инструкция администратора: первый запуск, работа с чеком, отчёт по кассе.</p>
+
+    <h2>1. Первый запуск: включить макросы</h2>
+    <p>Вся логика поиска и расчётов работает на макросах. Excel по умолчанию их блокирует — достаточно разрешить один раз:</p>
+    <ol class="steps">
+      <li>Меню <strong>Файл</strong> → <strong>Параметры Excel</strong> (кнопка внизу справа)</li>
+      <li><strong>Центр управления безопасностью</strong></li>
+      <li><strong>Параметры центра управления безопасностью</strong> → <strong>Параметры макросов</strong></li>
+      <li>Выбрать <strong>«Включить все макросы»</strong> → ОК</li>
+      <li>Перезапустить файл</li>
+    </ol>
+    <div class="note">Эта же инструкция продублирована на стартовом листе самого файла. При открытии Excel может показать жёлтую полосу «Включить содержимое» — нажмите её, это то же самое.</div>
+
+    <h2>2. Добавление услуги в чек</h2>
+    <h3>Умный поиск по двум буквам</h3>
+    <p>Начните вводить название — подойдут первые две буквы в любом регистре и любой раскладке клавиатуры:</p>
+    <table>
+      <tr><th>Ввод</th><th>Найдёт</th></tr>
+      <tr><td><kbd>пе</kbd> или <kbd>gt</kbd></td><td>Печать фото</td></tr>
+      <tr><td><kbd>ла</kbd> или <kbd>kf</kbd></td><td>Ламинация</td></tr>
+    </table>
+    <p>Стрелками <kbd>↑</kbd> <kbd>↓</kbd> выберите нужный вариант из списка — мышь не нужна. Это спасает при потоке клиентов и опечатках.</p>
+
+    <h3>Количество</h3>
+    <p>После выбора услуги курсор сам перескакивает в поле количества со значением «1». Изменить:</p>
+    <ul>
+      <li>стрелками <kbd>↑</kbd> <kbd>↓</kbd> на клавиатуре,</li>
+      <li>кнопками-индикаторами рядом с полем,</li>
+      <li>вводом цифры + <kbd>Enter</kbd>.</li>
+    </ul>
+    <p>Стоимость строки пересчитывается мгновенно.</p>
+
+    <h2>3. Оформление заказа</h2>
+    <p><kbd>Enter</kbd> — сумма строки идёт в общий счёт, фокус переходит на следующую пустую строку. Многостраничный чек — непрерывная последовательность нажатий, без мыши и калькулятора.</p>
+
+    <h2>4. Отчёт по кассе</h2>
+    <ul>
+      <li>Кнопка переноса отправляет чек дня в <strong>лист отчёта</strong> (общим списком; сортировка по категориям услуг — печать, сувенирка, фотокниги — планируется отдельным модулем).</li>
+      <li>На листе отчёта — кнопки суммирования: <strong>наличные</strong>, <strong>безналичные</strong> (карта) и <strong>общая сумма</strong>. Ежедневная сверка кассы и Z-отчёт — за секунды.</li>
+    </ul>
+
+    <h2>5. Очистка рабочего листа</h2>
+    <p>Кнопки со знаком «Стоянка запрещена» быстро очищают текущий лист от ошибочных позиций перед новым заказом — без ручного удаления строк и сброса форматирования.</p>
+
+    <h2>Что это даёт бизнесу</h2>
+    <ul>
+      <li><strong>Скорость:</strong> расчёт клиента быстрее на 40–60% — без бумажных прайсов и карманного калькулятора.</li>
+      <li><strong>Нулевая математика:</strong> исключены ошибки сложения чеков и сдачи.</li>
+      <li><strong>Обучение за 5 минут:</strong> новый сотрудник осваивает интерфейс сразу.</li>
+      <li><strong>Статистика:</strong> срез продаж за смену без дополнительных журналов.</li>
+    </ul>
+
+    <div class="cta">
+      <a class="button" href="photon-price-calculator.xlsm" download>Скачать калькулятор (Excel 2007+)</a>
+    </div>
+  </main>
+</body>
+</html>
