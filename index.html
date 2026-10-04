@@ -180,18 +180,23 @@
 
     .hero__resume {
       margin-top: 1.5rem;
-      font-size: 0.95rem;
-      color: var(--color-muted);
+      font-size: 0.875rem; /* 14px — как у подписи */
+      letter-spacing: 0.04em;
+      color: rgba(158, 180, 160, 0.6); /* серо-зелёный */
+    }
+
+    .hero__resume + .hero__resume {
+      margin-top: 0.4rem;
     }
 
     .hero__resume a {
-      color: var(--color-violet-light);
-      text-decoration-color: rgba(167, 139, 250, 0.4);
+      color: var(--color-green);
+      text-decoration-color: rgba(52, 211, 153, 0.4);
       text-underline-offset: 3px;
     }
 
     .hero__resume a:hover {
-      color: #c4b5fd;
+      color: #6ee7b7;
     }
 
     /* Параллакс фона: смещение слоёв при скролле */
@@ -335,14 +340,21 @@
 
     .made-with-ai span {
       display: inline-block;
-      animation: sway 2.8s ease-in-out infinite;
+      animation: sway 2.2s ease-in-out infinite, breathe 3.6s ease-in-out infinite;
     }
 
     /* Покачивание буквы из стороны в сторону */
     @keyframes sway {
       0%, 100% { transform: rotate(0deg) translateX(0); }
-      25%      { transform: rotate(4deg) translateX(0.5px); }
-      75%      { transform: rotate(-4deg) translateX(-0.5px); }
+      25%      { transform: rotate(8deg) translateX(1.2px); }
+      75%      { transform: rotate(-8deg) translateX(-1.2px); }
+    }
+
+    /* Дыхание: мерцание прозрачности (scale не используем, чтобы
+       не конфликтовать с transform в sway) */
+    @keyframes breathe {
+      0%, 100% { opacity: 0.45; }
+      50%      { opacity: 0.85; }
     }
 
     /* Тост «адрес скопирован» */
@@ -492,7 +504,8 @@
         <a class="button button--ghost" href="mailto:shrumi@yandex.ru?subject=%D0%97%D0%B0%D0%BF%D1%80%D0%BE%D1%81%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0" title="shrumi@yandex.ru — если почта не открылась, адрес скопируется в буфер" aria-label="Написать на shrumi@yandex.ru">Написать мне</a>
       </div>
 
-      <p class="hero__resume">Почта: <a href="mailto:shrumi@yandex.ru">shrumi@yandex.ru</a> · Резюме: <a href="https://volgograd.hh.ru/resume/5ccfcb19ff0da6af110039ed1f357378524250" target="_blank" rel="noopener">Промпт-инженер / Вайбкодер</a> на hh.ru</p>
+      <p class="hero__resume">Почта: <a href="mailto:shrumi@yandex.ru">shrumi@yandex.ru</a></p>
+      <p class="hero__resume">Резюме: <a href="https://volgograd.hh.ru/resume/5ccfcb19ff0da6af110039ed1f357378524250" target="_blank" rel="noopener">Промпт-инженер / Вайбкодер</a> на hh.ru</p>
     </section>
 
     <section class="services" aria-label="Услуги">
