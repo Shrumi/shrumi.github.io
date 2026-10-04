@@ -324,7 +324,7 @@
       right: 1rem;
       bottom: 0.75rem;
       z-index: 2;
-      font-size: 0.5rem; /* ~8px */
+      font-size: 0.875rem; /* 14px */
       letter-spacing: 0.04em;
       color: rgba(158, 180, 160, 0.55); /* серо-зелёный, полупрозрачный */
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 0, 0, 0.5);
@@ -371,7 +371,10 @@
     }
 
     .button {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
       padding: 1rem 2.5rem;
       background: linear-gradient(90deg, #10b981, var(--color-violet));
       color: #fff;
@@ -381,6 +384,13 @@
       border-radius: 8px;
       box-shadow: 0 0 24px rgba(124, 58, 237, 0.4);
       transition: filter 0.2s ease, transform 0.2s ease;
+    }
+
+    .button__icon {
+      flex-shrink: 0;
+      width: 1.2em;
+      height: 1.2em;
+      fill: currentColor;
     }
 
     .button:hover {
@@ -538,7 +548,12 @@
       </div>
 
       <div class="portfolio__cta">
-        <a class="button" href="https://t.me/Shrumi" target="_blank" rel="noopener">Обсудить проект</a>
+        <a class="button" href="https://t.me/Shrumi" target="_blank" rel="noopener">
+          <svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M9.04 15.31l-.38 5.36c.54 0 .78-.23 1.06-.51l2.55-2.44 5.28 3.87c.97.53 1.65.25 1.92-.9L23.9 3.35c.31-1.42-.51-1.98-1.46-1.63L1.13 9.98c-1.39.54-1.37 1.32-.24 1.67l4.94 1.54L18.13 5.42c.54-.36 1.03-.16.63.2L9.04 15.31z"/>
+          </svg>
+          Обсудить проект
+        </a>
         <p class="portfolio__cta-note">Расскажите о задаче — предложу решение и оценку.</p>
       </div>
     </section>
