@@ -6,8 +6,8 @@
   <title>Дмитрий Скородько — Промпт-инженер, vibe-кодер | Промпты для LLM и автоматизация с ИИ</title>
 
   <!-- SEO -->
-  <meta name="description" content="Дмитрий Скородько — промпт-инженер и vibe-кодер. Системные промпты для ChatGPT, Claude, Gemini, автоматизация бизнес-задач с ИИ, аудит промптов, обучение команд. Портфолио и контакты.">
-  <meta name="keywords" content="промпт-инженер, промпт-инжиниринг, prompt engineering, промптинг, LLM, ChatGPT, Claude, Gemini, GPT, ИИ, AI, нейросети, языковые модели, системные промпты, автоматизация с ИИ, ИИ-автоматизация, vibe coding, vibe-кодер, ИИ-специалист, специалист по ИИ, Дмитрий Скородько">
+  <meta name="description" content="Дмитрий Скородько — промпт-инженер и vibe-кодер. Системные промпты для ChatGPT, Claude, Gemini, автоматизация с ИИ, промо-страницы и лендинги (сингл «Осень. Сказочный чертог»). Портфолио и контакты.">
+  <meta name="keywords" content="промпт-инженер, промпт-инжиниринг, prompt engineering, промптинг, LLM, ChatGPT, Claude, Gemini, GPT, ИИ, AI, нейросети, языковые модели, системные промпты, автоматизация с ИИ, ИИ-автоматизация, vibe coding, vibe-кодер, ИИ-специалист, специалист по ИИ, нейромузыка, Suno, промо-страница, лендинг, одностраничный сайт, Дмитрий Скородько">
   <meta name="author" content="Дмитрий Скородько">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://shrumi.github.io/">
@@ -37,8 +37,15 @@
     "description": "Промпт-инженер и vibe-кодер: системные промпты для LLM, автоматизация с ИИ, аудит промптов, обучение команд.",
     "knowsAbout": [
       "Prompt Engineering", "Промпт-инжиниринг", "LLM", "ChatGPT", "Claude", "Gemini",
-      "Автоматизация с ИИ", "Vibe Coding", "Нейросети", "Языковые модели"
+      "Автоматизация с ИИ", "Vibe Coding", "Нейросети", "Языковые модели",
+      "Нейромузыка", "Suno", "Промо-страницы", "Лендинги"
     ],
+    "hasPart": {
+      "@type": "CreativeWork",
+      "name": "Осень. Сказочный чертог",
+      "url": "https://shrumi.github.io/Osen/",
+      "description": "Промо-страница сингла нейромузыканта ShrUmi DjAga на стихи Бориса Пастернака."
+    },
     "sameAs": [
       "https://t.me/Shrumi",
       "https://volgograd.hh.ru/resume/5ccfcb19ff0da6af110039ed1f357378524250",
@@ -106,6 +113,44 @@
 
     @keyframes dash {
       to { stroke-dashoffset: -600; }
+    }
+
+    /* Звёзды из туманности: слева у истока пунктирной линии (120, 320).
+       Карусель по спирали: каждая звезда запаздывает на свою долю цикла —
+       получается непрерывный поток рождений и возвратов.
+       Смещение сразу по трём осям: X (спираль), Y (подъём/спуск), scale (глубина). */
+    .nebula {
+      transform: translate(120px, 320px);
+    }
+
+    .nebula__star {
+      animation: star-orbit 14s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .star-path-2 { animation-delay: -2.33s; }
+    .star-path-3 { animation-delay: -4.66s; }
+    .star-path-4 { animation-delay: -7s; }
+    .star-path-5 { animation-delay: -9.33s; }
+    .star-path-6 { animation-delay: -11.66s; }
+
+    @keyframes star-orbit {
+      0%   { transform: translate(0, 0) scale(0.2); opacity: 0; }
+      12%  { opacity: 0.95; }
+      30%  { transform: translate(46px, -26px) scale(1); }
+      55%  { transform: translate(64px, -8px) scale(0.7) ; }
+      80%  { opacity: 0.5; }
+      100% { transform: translate(0, 0) scale(0.2); opacity: 0; }
+    }
+
+    /* Туманность медленно пульсирует */
+    .nebula__cloud {
+      animation: cloud-pulse 6s ease-in-out infinite;
+      transform-origin: 120px 320px;
+    }
+
+    @keyframes cloud-pulse {
+      0%, 100% { opacity: 0.55; transform: scale(1); }
+      50%      { opacity: 0.9; transform: scale(1.25); }
     }
 
     /* Hero */
@@ -197,6 +242,17 @@
 
     .hero__resume a:hover {
       color: #6ee7b7;
+    }
+
+    /* Дыхание почты/резюме при наведении: строки плавно мерцают
+       (opacity-анимация не конфликтует с цветом ссылок) */
+    .hero__resume {
+      transition: color 0.3s ease;
+    }
+
+    .hero__resume:hover {
+      animation: breathe 1.6s ease-in-out infinite;
+      color: rgba(158, 180, 160, 0.9);
     }
 
     /* Параллакс фона: смещение слоёв при скролле */
@@ -317,6 +373,45 @@
       color: var(--color-muted);
     }
 
+    /* Примеры выполненных работ */
+    .showcase {
+      padding-bottom: var(--space-section);
+    }
+
+    .showcase__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 3rem;
+    }
+
+    .work-card--showcase {
+      border-color: rgba(52, 211, 153, 0.25);
+    }
+
+    .showcase__link {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .showcase__link--cta {
+      color: var(--color-green);
+      font-size: 0.95rem;
+      text-decoration-color: rgba(52, 211, 153, 0.4);
+      text-underline-offset: 3px;
+    }
+
+    .showcase__link--cta:hover {
+      color: #6ee7b7;
+    }
+
+    @media (max-width: 900px) {
+      .showcase__grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .showcase__grid { grid-template-columns: 1fr; }
+    }
+
     /* CTA */
     .cta {
       text-align: center;
@@ -429,7 +524,10 @@
       html { scroll-behavior: auto; }
       .hero__title,
       .bg-art .flow,
-      .made-with-ai span {
+      .made-with-ai span,
+      .nebula__star,
+      .nebula__cloud,
+      .hero__resume:hover {
         animation: none;
       }
       .bg-art { transform: none !important; }
@@ -446,6 +544,17 @@
         <stop offset="1" stop-color="#7c3aed"/>
       </linearGradient>
       <path id="spiral" d="M0 0 a4 4 0 0 1 8 0 a8 8 0 0 1 -16 0 a12 12 0 0 1 24 0 a16 16 0 0 1 -32 0 a20 20 0 0 1 40 0 a24 24 0 0 1 -48 0" fill="none"/>
+      <!-- Звезда: ядро (почти ярко-тёмно-зелёное) → прозрачный серо-зелёный ореол -->
+      <radialGradient id="star-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#4ade80"/>
+        <stop offset="35%" stop-color="#15803d"/>
+        <stop offset="70%" stop-color="#9eb4a0" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#9eb4a0" stop-opacity="0"/>
+      </radialGradient>
+      <g id="nebula-star">
+        <circle r="7" fill="url(#star-glow)"/>
+        <circle r="1.6" fill="#4ade80"/>
+      </g>
     </defs>
 
     <!-- Нейросеть: связи и узлы -->
@@ -490,6 +599,22 @@
       <use href="#spiral" transform="translate(1340 420) scale(3) rotate(20)" stroke-width="1"/>
       <use href="#spiral" transform="translate(430 120) scale(2.4) rotate(-15)" stroke-width="1"/>
       <use href="#spiral" transform="translate(520 800) scale(2) rotate(40)" stroke-width="1" opacity="0.7"/>
+    </g>
+
+    <!-- Туманность со звёздами: слева, у истока пунктирной линии.
+         Каждая звезда рождается из туманности, уходит по спирали
+         со смещением по трём осям (X, Y, scale) и возвращается. -->
+    <g class="nebula" opacity="0.85">
+      <g class="nebula__cloud">
+        <circle cx="0" cy="0" r="26" fill="url(#star-glow)" opacity="0.5"/>
+        <circle cx="0" cy="0" r="12" fill="url(#star-glow)" opacity="0.8"/>
+      </g>
+      <g class="nebula__star star-path-1"><use href="#nebula-star"/></g>
+      <g class="nebula__star star-path-2"><use href="#nebula-star"/></g>
+      <g class="nebula__star star-path-3"><use href="#nebula-star"/></g>
+      <g class="nebula__star star-path-4"><use href="#nebula-star"/></g>
+      <g class="nebula__star star-path-5"><use href="#nebula-star"/></g>
+      <g class="nebula__star star-path-6"><use href="#nebula-star"/></g>
     </g>
   </svg>
 
@@ -568,6 +693,30 @@
           Обсудить проект
         </a>
         <p class="portfolio__cta-note">Расскажите о задаче — предложу решение и оценку.</p>
+      </div>
+    </section>
+
+    <section class="showcase" aria-label="Примеры выполненных работ">
+      <header>
+        <h2 class="portfolio__heading">Примеры выполненных работ</h2>
+      </header>
+
+      <div class="showcase__grid">
+        <article class="work-card work-card--showcase" itemscope itemtype="https://schema.org/CreativeWork">
+          <h3 class="work-card__title">
+            <a class="showcase__link" href="https://shrumi.github.io/Osen/" target="_blank" rel="noopener" itemprop="url">
+              «Осень. Сказочный чертог»
+            </a>
+          </h3>
+          <p class="work-card__row" itemprop="description">Промо-страница сингла нейромузыканта ShrUmi DjAga: музыкальное прочтение стихотворения Бориса Пастернака из альбома «Электролес».</p>
+          <p class="work-card__row work-card__row--result">
+            <span class="work-card__label">Результат</span>
+            4 версии трека, плеер и полный текст стихотворения — на одной странице.
+          </p>
+          <p class="showcase__cta-row">
+            <a class="showcase__link showcase__link--cta" href="https://shrumi.github.io/Osen/" target="_blank" rel="noopener">Смотреть страницу сингла →</a>
+          </p>
+        </article>
       </div>
     </section>
 
