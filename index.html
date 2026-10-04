@@ -18,8 +18,13 @@
   <meta property="og:title" content="Дмитрий Скородько — Промпт-инженер, vibe-кодер">
   <meta property="og:description" content="Проектирую промпты для LLM и автоматизирую задачи с ИИ: ChatGPT, Claude, Gemini. Портфолио, услуги, контакты.">
   <meta property="og:url" content="https://shrumi.github.io/">
+  <meta property="og:image" content="https://shrumi.github.io/assets/og-image.png">
   <meta property="og:locale" content="ru_RU">
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://shrumi.github.io/assets/og-image.png">
+
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/favicon.png">
 
   <!-- Schema.org: разметка для рекрутёров и поисковиков -->
   <script type="application/ld+json">
@@ -187,6 +192,15 @@
 
     .hero__resume a:hover {
       color: #c4b5fd;
+    }
+
+    /* Параллакс фона: смещение слоёв при скролле */
+    .bg-art {
+      will-change: transform;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bg-art { transform: none !important; }
     }
 
     /* Services */
@@ -411,10 +425,10 @@
 
       <div class="hero__actions">
         <a class="button" href="#works">Портфолио</a>
-        <a class="button button--ghost" href="https://t.me/Shrumi" target="_blank" rel="noopener">Написать мне</a>
+        <a class="button button--ghost" href="mailto:shrumi@yandex.ru">Написать мне</a>
       </div>
 
-      <p class="hero__resume">Резюме: <a href="https://volgograd.hh.ru/resume/5ccfcb19ff0da6af110039ed1f357378524250" target="_blank" rel="noopener">IT-специалист / Системный администратор</a> на hh.ru</p>
+      <p class="hero__resume">Резюме: <a href="https://volgograd.hh.ru/resume/5ccfcb19ff0da6af110039ed1f357378524250" target="_blank" rel="noopener">Промпт-инженер / Вайбкодер</a> на hh.ru</p>
     </section>
 
     <section class="services" aria-label="Услуги">
@@ -476,10 +490,29 @@
     </section>
 
     <section class="cta">
-      <a class="button" href="https://t.me/Shrumi" target="_blank" rel="noopener">Написать мне</a>
+      <a class="button" href="mailto:shrumi@yandex.ru">Написать мне</a>
     </section>
 
   </main>
+
+  <script>
+    // Параллакс фона: SVG смещается медленнее скролла.
+    // rAF + pointer-events:none — без дёрганий и без перехвата кликов.
+    (function () {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var bg = document.querySelector('.bg-art');
+      if (!bg) return;
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+          bg.style.transform = 'translateY(' + (window.scrollY * 0.25) + 'px)';
+          ticking = false;
+        });
+      }, { passive: true });
+    })();
+  </script>
 
 </body>
 </html>
