@@ -414,6 +414,15 @@
       text-decoration: none;
     }
 
+    /* Ссылки релиза — каждая в своей строке */
+    .showcase__cta-list {
+      list-style: none;
+      margin: 1rem 0 0;
+      padding: 0;
+      display: grid;
+      gap: 0.55rem;
+    }
+
     .showcase__link--cta {
       color: var(--color-green);
       font-size: 0.95rem;
@@ -707,13 +716,12 @@
             <span class="work-card__label">Результат</span>
             Расчёт клиента ускорен на 40–60%, ошибки ручного счёта исключены.
           </p>
-          <p class="showcase__cta-row">
-            <a class="showcase__link showcase__link--cta" href="https://github.com/Shrumi/photon-calculator/releases/tag/v1.0.0-demo" target="_blank" rel="noopener">Скачать демо для Windows (exe)</a>
-            <span aria-hidden="true"> · </span>
-            <a class="showcase__link showcase__link--cta" href="files/photon-price-calculator.xlsm" download>Версия для Excel (xlsm)</a>
-            <span aria-hidden="true"> · </span>
-            <a class="showcase__link showcase__link--cta" href="files/photon-instruction.html">Инструкция →</a>
-          </p>
+          <ul class="showcase__cta-list">
+            <li><a class="showcase__link showcase__link--cta" href="https://github.com/Shrumi/photon-calculator/releases/tag/v1.0.0-demo" target="_blank" rel="noopener">Скачать демо для Windows (exe)</a></li>
+            <li><a class="showcase__link showcase__link--cta" href="files/photon-price-calculator.xlsm" download>Версия для Excel (xlsm)</a></li>
+            <li><a class="showcase__link showcase__link--cta" href="files/photon-instruction.html">Инструкция →</a></li>
+            <li><a class="showcase__link showcase__link--cta" href="photon-key/">Запросить ключ активации →</a></li>
+          </ul>
           <meta itemprop="operatingSystem" content="Windows 10/11, Excel 2007+">
           <meta itemprop="applicationCategory" content="BusinessApplication">
           <link itemprop="downloadUrl" href="https://github.com/Shrumi/photon-calculator/releases/download/v1.0.0-demo/PhotonCalcDemo.exe">
@@ -776,9 +784,12 @@
       }
       document.querySelectorAll('a[href^="mailto:"]').forEach(function (link) {
         link.addEventListener('click', function () {
+          // Копируем ПОЛНЫЙ mailto (с темой) — из буфера откроется письмо
+          // с готовой темой, а сам адрес виден в начале строки.
+          var href = link.getAttribute('href') || ('mailto:' + EMAIL);
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(EMAIL).then(function () {
-              showToast('Адрес ' + EMAIL + ' скопирован в буфер');
+            navigator.clipboard.writeText(link.href || href).then(function () {
+              showToast('Скопировано в буфер: ' + EMAIL);
             }).catch(function () {});
           }
         });

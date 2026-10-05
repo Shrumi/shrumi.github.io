@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Запрос ключа — Калькулятор прайса фотосалона | Дмитрий Скородько</title>
+  <meta name="description" content="Запрос ключа активации калькулятора прайса фотосалона: скопируйте готовое письмо с вашим Machine ID и отправьте на shrumi@yandex.ru.">
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-bg: #0a0a14;
+      --color-surface: #14141f;
+      --color-border: rgba(255, 255, 255, 0.09);
+      --color-text: #e7e9f0;
+      --color-muted: #a3a8b8;
+      --color-green: #34d399;
+      --color-violet: #7c3aed;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .key-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      max-width: 520px;
+      width: 100%;
+    }
+    .key-card h1 { margin: 0 0 0.5rem; font-size: 1.35rem; }
+    .key-card .lead { color: var(--color-muted); font-size: 0.92rem; margin: 0 0 1.4rem; line-height: 1.5; }
+    .mid {
+      background: #0d0d17;
+      color: var(--color-green);
+      border: 1px dashed rgba(52, 211, 153, 0.4);
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
+      user-select: all;
+      text-align: center;
+    }
+    .mid-hint { color: var(--color-muted); font-size: 0.75rem; margin: 0 0 1.2rem; text-align: center; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      width: 100%; border: none; cursor: pointer;
+      padding: 0.8rem 1.4rem; border-radius: 8px;
+      font-size: 0.95rem; font-weight: 600; font-family: inherit; color: #fff;
+      background: linear-gradient(90deg, #10b981, var(--color-violet));
+      text-decoration: none;
+    }
+    .btn.secondary { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--color-border); margin-top: 0.6rem; }
+    .btn:hover { filter: brightness(1.1); }
+    #status { text-align: center; color: var(--color-green); font-size: 0.85rem; min-height: 1.3em; margin-top: 0.8rem; }
+    .back { display: block; text-align: center; color: var(--color-muted); font-size: 0.82rem; margin-top: 1.4rem; text-decoration: none; }
+    .back:hover { color: var(--color-green); }
+    .steps { color: var(--color-muted); font-size: 0.85rem; line-height: 1.6; padding-left: 1.2rem; margin: 0 0 1.4rem; }
+    .steps b { color: var(--color-text); }
+  </style>
+</head>
+<body>
+  <main class="key-card" aria-label="Запрос ключа активации">
+    <h1>Запрос ключа активации</h1>
+    <p class="lead">Демо-версия калькулятора прайса фотосалона отработала своё время. Для получения ключа:</p>
+    <ol class="steps">
+      <li>Запустите приложение — на экране блокировки указан ваш <b>Machine ID</b> (или возьмите его ниже, если пришли со страницы приложения).</li>
+      <li>Нажмите «Скопировать письмо» — в буфер попадёт готовое письмо.</li>
+      <li>Вставьте его в почту на <b>shrumi@yandex.ru</b> и отправьте.</li>
+    </ol>
+    <div class="mid" id="mid" title="Нажмите, чтобы скопировать" role="button" tabindex="0">—</div>
+    <p class="mid-hint">Ваш Machine ID (нажмите, чтобы скопировать)</p>
+    <button class="btn" id="btnCopyLetter">Скопировать письмо</button>
+    <a class="btn secondary" id="btnMail" href="mailto:shrumi@yandex.ru">Открыть почту (адрес скопируется)</a>
+    <div id="status" role="status" aria-live="polite"></div>
+    <a class="back" href="/">← На главную</a>
+  </main>
+
+  <script>
+    "use strict";
+    var EMAIL = "shrumi@yandex.ru";
+    var SUBJECT = "Запрос ключа ФОТОН";
+
+    function status(msg) {
+      document.getElementById("status").textContent = msg;
+    }
+
+    function copyText(text, ok) {
+      function fallback() {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (e) { /* noop */ }
+        ta.remove();
+        ok();
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(ok, fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    // Machine ID из хеша: #mid=XXXX-XXXX-XXXX
+    var mid = "—";
+    var m = window.location.hash.match(/mid=([A-Za-z0-9-]+)/);
+    if (m) mid = m[1].toUpperCase();
+    document.getElementById("mid").textContent = mid;
+
+    document.getElementById("mid").addEventListener("click", function () {
+      copyText(mid, function () { status("Machine ID скопирован"); });
+    });
+
+    document.getElementById("btnCopyLetter").addEventListener("click", function () {
+      var letter = "Тема: " + SUBJECT + "\n\nMachine ID: " + mid + "\n\nПрошу выдать ключ активации калькулятора прайса фотосалона.";
+      copyText(letter, function () { status("Письмо скопировано — вставьте в почту и отправьте"); });
+    });
+
+    document.getElementById("btnMail").addEventListener("click", function (e) {
+      e.preventDefault();
+      var mailto = "mailto:" + EMAIL + "?subject=" + encodeURIComponent(SUBJECT) + "&body=" + encodeURIComponent("Machine ID: " + mid + "\n\nПрошу выдать ключ активации калькулятора прайса фотосалона.");
+      copyText(mailto, function () { status("Адрес и ссылка скопированы в буфер обмена"); });
+    });
+  </script>
+</body>
+</html>
