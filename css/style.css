@@ -1,0 +1,543 @@
+/* ============================================================
+   Дмитрий Скородько — shrumi.github.io
+   Единая таблица стилей. Структура:
+     1. Токены и базовые стили
+     2. Каркас страницы (контейнер)
+     3. Фон «внутренний мир нейросетей» (SVG-арт)
+     4. Шапка (Hero)
+     5. Кнопки
+     6. Услуги
+     7. Портфолио
+     8. Призыв к действию (CTA)
+     9. Подпись-водяной знак
+    10. Тост «адрес скопирован»
+    11. Адаптивность и доступность
+   Методология имён — БЭМ (блок__элемент--модификатор).
+   ============================================================ */
+
+/* ============================================================
+   1. ПЕРЕМЕННЫЕ И БАЗОВЫЕ СТИЛИ
+   ============================================================ */
+:root {
+  --color-bg: #0a0a14;
+  --color-text: #f2f1f7;
+  --color-muted: #a5a3b8;
+  --color-green: #34d399;
+  --color-violet: #7c3aed;
+  --color-violet-light: #a78bfa;
+  --container-width: 960px;
+  --space-section: clamp(4rem, 10vw, 8rem);
+}
+
+/* Сброс отступов и нормализация блочной модели */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   2. КАРКАС СТРАНИЦЫ: обёртка контента по центру
+   ============================================================ */
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   3. ФОН: абстрактный мир нейросетей (линии, узлы, туманность)
+   ============================================================ */
+.bg-art {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Пунктирные «потоки данных» */
+.bg-art__flow {
+  stroke-dasharray: 6 14;
+  animation: dash 40s linear infinite;
+}
+
+@keyframes dash {
+  to { stroke-dashoffset: -600; }
+}
+
+/* Пульс узлов нейросети: мягкое «сердцебиение» с фазовым сдвигом.
+   Фазы задержек — через модификаторы БЭМ (--d1…--d3). */
+.bg-art__node {
+  animation: node-pulse 5.2s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.bg-art__node--d1 { animation-delay: -0.8s; }
+.bg-art__node--d2 { animation-delay: -1.6s; }
+.bg-art__node--d3 { animation-delay: -2.4s; }
+
+@keyframes node-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50%      { transform: scale(1.6); opacity: 1; }
+}
+
+/* Туманность (облако + орбита звёзд) у истока пунктира */
+.bg-art__nebula {
+  transform: translate(120px, 320px);
+}
+
+.bg-art__star {
+  animation: star-orbit 14s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Задержка орбиты каждой звезды: фазы карусели (цикл 14s / 6 звёзд) */
+.bg-art__star--p2 { animation-delay: -2.33s; }
+.bg-art__star--p3 { animation-delay: -4.66s; }
+.bg-art__star--p4 { animation-delay: -7s; }
+.bg-art__star--p5 { animation-delay: -9.33s; }
+.bg-art__star--p6 { animation-delay: -11.66s; }
+
+@keyframes star-orbit {
+  0%   { transform: translate(0, 0) scale(0.2); opacity: 0; }
+  12%  { opacity: 0.95; }
+  30%  { transform: translate(46px, -26px) scale(1); }
+  55%  { transform: translate(64px, -8px) scale(0.7) ; }
+  80%  { opacity: 0.5; }
+  100% { transform: translate(0, 0) scale(0.2); opacity: 0; }
+}
+
+/* Туманность медленно пульсирует */
+.bg-art__cloud {
+  animation: cloud-breathe 14s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  /* Круги облака стоят в локальном (0,0) группы .bg-art__nebula — это и есть
+     точка старта пунктира (120, 320). fill-box привязывает центр
+     масштабирования к самому облаку: при сжатии стягивается туда. */
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Туманность дышит в такт орбите звёзд (14s): звёзды уходят —
+   облако разрастается и светлеет; вернулись — сжалось к точке старта */
+@keyframes cloud-breathe {
+  0%   { opacity: 0.45; transform: scale(0.55); }
+  30%  { opacity: 0.9;  transform: scale(1.25); }
+  55%  { opacity: 0.75; transform: scale(1.05); }
+  80%  { opacity: 0.7;  transform: scale(0.95); }
+  100% { opacity: 0.45; transform: scale(0.55); }
+}
+
+/* ============================================================
+   4. ШАПКА (Hero): имя с 3D-экструзией, подзаголовок, действия
+   ============================================================ */
+.hero {
+  padding: var(--space-section) 0;
+}
+
+.hero__title {
+  position: relative;
+  display: inline-block;
+  font-size: clamp(2.6rem, 9vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(100deg, #4ade80 0%, var(--color-green) 30%, var(--color-violet-light) 60%, var(--color-violet) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 6s linear infinite;
+}
+
+/* 3D-экструзия имени: копия текста позади с многослойной тенью */
+.hero__title::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: #14082a;
+  text-shadow:
+    1px 1px 0 #1e0b38,
+    2px 2px 0 #1e0b38,
+    3px 3px 0 #241040,
+    4px 4px 0 #241040,
+    5px 5px 0 #2a1350,
+    6px 6px 0 #2a1350,
+    7px 7px 0 #31165e,
+    8px 8px 0 #31165e,
+    0 0 24px rgba(124, 58, 237, 0.55),
+    0 0 48px rgba(52, 211, 153, 0.35);
+}
+
+@keyframes sheen {
+  to { background-position: 200% center; }
+}
+
+.hero__subtitle {
+  margin-top: 1.25rem;
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  color: var(--color-muted);
+  max-width: 40ch;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Контурная кнопка. ВАЖНО: объявлена РАНЬШЕ базового .button —
+   сохраняем порядок, чтобы вид кнопки не изменился. */
+.button--ghost {
+  background: transparent;
+  color: var(--color-green);
+  box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.5);
+}
+
+.button--ghost:hover {
+  background: rgba(52, 211, 153, 0.1);
+  filter: none;
+  transform: translateY(-2px);
+}
+
+/* Строки почты и резюме под кнопками */
+.hero__resume {
+  margin-top: 1.5rem;
+  font-size: 0.875rem; /* 14px — как у подписи */
+  letter-spacing: 0.04em;
+  color: rgba(158, 180, 160, 0.6); /* серо-зелёный */
+}
+
+.hero__resume + .hero__resume {
+  margin-top: 0.4rem;
+}
+
+.hero__resume a {
+  color: var(--color-green);
+  text-decoration-color: rgba(52, 211, 153, 0.4);
+  text-underline-offset: 3px;
+}
+
+.hero__resume a:hover {
+  color: #6ee7b7;
+}
+
+/* Дыхание почты/резюме при наведении: строки плавно мерцают
+   (opacity-анимация не конфликтует с цветом ссылок) */
+.hero__resume {
+  transition: color 0.3s ease;
+}
+
+.hero__resume:hover {
+  animation: breathe 1.6s ease-in-out infinite;
+  color: rgba(158, 180, 160, 0.9);
+}
+
+/* Параллакс фона: смещение слоёв при скролле */
+.bg-art {
+  will-change: transform;
+}
+
+/* ============================================================
+   5. УСЛУГИ: сетка из трёх карточек
+   ============================================================ */
+.services__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.service-card {
+  padding: 2rem;
+  border: 1px solid rgba(167, 139, 250, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.service-card__title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-green);
+}
+
+.service-card__text {
+  margin-top: 0.5rem;
+  color: var(--color-muted);
+}
+
+/* ============================================================
+   6. ПОРТФОЛИО: заголовок, сетка карточек, CTA
+   ============================================================ */
+.portfolio {
+  padding: var(--space-section) 0;
+  scroll-margin-top: 2rem;
+}
+
+.portfolio__heading {
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.portfolio__lead {
+  margin-top: 0.75rem;
+  color: var(--color-muted);
+  max-width: 60ch;
+}
+
+.portfolio__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.work-card {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  border: 1px solid rgba(167, 139, 250, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.work-card__title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-green);
+}
+
+.work-card__title a {
+  color: inherit;
+}
+
+.work-card__row {
+  margin-top: 0.9rem;
+  font-size: 0.95rem;
+  color: var(--color-muted);
+}
+
+.work-card__label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-green);
+  margin-bottom: 0.15rem;
+}
+
+.work-card__row--result {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(167, 139, 250, 0.15);
+}
+
+.work-card__result-value {
+  color: var(--color-green);
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+.portfolio__cta {
+  text-align: center;
+  margin-top: 3.5rem;
+}
+
+.portfolio__cta-note {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+/* Карточки-релизы внутри Портфолио (бывш. «Примеры работ») */
+.work-card--showcase {
+  border-color: rgba(52, 211, 153, 0.25);
+}
+
+.work-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Ссылки релиза — каждая в своей строке */
+.work-card__cta-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.work-card__link--cta {
+  color: var(--color-green);
+  font-size: 0.95rem;
+  text-decoration-color: rgba(52, 211, 153, 0.4);
+  text-underline-offset: 3px;
+}
+
+.work-card__link--cta:hover {
+  color: #6ee7b7;
+}
+
+/* ============================================================
+   7. ПРИЗЫВ К ДЕЙСТВИЮ (CTA)
+   ============================================================ */
+.cta {
+  text-align: center;
+  padding-bottom: var(--space-section);
+}
+
+/* ============================================================
+   8. КНОПКА-ГРАДИЕНТ (базовый блок; модификатор --ghost выше)
+   ============================================================ */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2.5rem;
+  background: linear-gradient(90deg, #10b981, var(--color-violet));
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 8px;
+  box-shadow: 0 0 24px rgba(124, 58, 237, 0.4);
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.button__icon {
+  flex-shrink: 0;
+  width: 1.2em;
+  height: 1.2em;
+  fill: currentColor;
+}
+
+.button:hover {
+  filter: brightness(1.2);
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   9. ПОДПИСЬ-ВОДЯНОЙ ЗНАК: покачивание и дыхание букв
+   ============================================================ */
+.made-with-ai {
+  position: fixed;
+  right: 1rem;
+  bottom: 0.75rem;
+  z-index: 2;
+  font-size: 0.875rem; /* 14px */
+  letter-spacing: 0.04em;
+  color: rgba(158, 180, 160, 0.55); /* серо-зелёный, полупрозрачный */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  white-space: nowrap;
+}
+
+.made-with-ai__char {
+  display: inline-block;
+  animation: sway 2.2s ease-in-out infinite, breathe 3.6s ease-in-out infinite;
+}
+
+/* Покачивание буквы из стороны в сторону */
+@keyframes sway {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  25%      { transform: rotate(8deg) translateX(1.2px); }
+  75%      { transform: rotate(-8deg) translateX(-1.2px); }
+}
+
+/* Дыхание: мерцание прозрачности (scale не используем, чтобы
+   не конфликтовать с transform в sway) */
+@keyframes breathe {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.85; }
+}
+
+/* ============================================================
+   10. ТОСТ «адрес скопирован»
+   ============================================================ */
+.copy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translate(-50%, 12px);
+  z-index: 3;
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  background: rgba(20, 16, 42, 0.92);
+  color: var(--color-green);
+  font-size: 0.9rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+  pointer-events: none;
+}
+
+.copy-toast--visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+/* ============================================================
+   11. АДАПТИВНОСТЬ И ДОСТУПНОСТЬ
+   ============================================================ */
+
+/* Параллакс фона: смещение слоёв при скролле (JS) */
+.bg-art {
+  will-change: transform;
+}
+
+@media (max-width: 900px) {
+  .services__grid,
+  .portfolio__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .services__grid,
+  .portfolio__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero__title,
+  .bg-art__flow,
+  .bg-art__node,
+  .made-with-ai__char,
+  .bg-art__star,
+  .bg-art__cloud,
+  .hero__resume:hover {
+    animation: none;
+  }
+  .bg-art { transform: none !important; }
+}
