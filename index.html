@@ -11,6 +11,8 @@
   <meta name="author" content="Дмитрий Скородько">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://shrumi.github.io/">
+  <!-- CSP: запрет eval, инлайн-скриптов и произвольных источников (XSS-защита) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -242,7 +244,7 @@
             <li><a class="work-card__link work-card__link--cta" href="https://github.com/Shrumi/photon-calculator/releases/tag/v1.0.0-demo" target="_blank" rel="noopener">Скачать демо для Windows (exe)</a></li>
             <li><a class="work-card__link work-card__link--cta" href="photon-key/">Запросить ключ активации →</a></li>
           </ul>
-          <meta itemprop="operatingSystem" content="Windows 10/11, Excel 2007+">
+          <meta itemprop="operatingSystem" content="Windows 10/11">
           <meta itemprop="applicationCategory" content="BusinessApplication">
           <link itemprop="downloadUrl" href="https://github.com/Shrumi/photon-calculator/releases/download/v1.0.0-demo/PhotonCalcDemo.exe">
         </article>
