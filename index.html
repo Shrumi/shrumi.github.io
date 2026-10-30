@@ -29,30 +29,108 @@
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="apple-touch-icon" href="assets/favicon.png">
 
-  <!-- Schema.org: разметка для рекрутёров и поисковиков -->
+  <!-- Schema.org: разметка для рекрутёров, поисковиков и портфолио -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Дмитрий Скородько",
-    "url": "https://shrumi.github.io/",
-    "jobTitle": "Промпт-инженер",
-    "description": "Промпт-инженер и vibe-кодер: системные промпты для LLM, автоматизация с ИИ, аудит промптов, обучение команд.",
-    "knowsAbout": [
-      "Prompt Engineering", "Промпт-инжиниринг", "LLM", "ChatGPT", "Claude", "Gemini",
-      "Автоматизация с ИИ", "Vibe Coding", "Нейросети", "Языковые модели",
-      "Нейромузыка", "Suno", "Промо-страницы", "Лендинги"
-    ],
-    "hasPart": {
-      "@type": "CreativeWork",
-      "name": "Осень. Сказочный чертог",
-      "url": "https://shrumi.github.io/Osen/",
-      "description": "Промо-страница сингла нейромузыканта ShrUmi DjAga на стихи Бориса Пастернака."
-    },
-    "sameAs": [
-      "https://t.me/Shrumi",
-      "https://volgograd.hh.ru/resume/5ccfcb19ff0da6af110039ed1f357378524250",
-      "https://github.com/Shrumi"
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://shrumi.github.io/#website",
+        "url": "https://shrumi.github.io/",
+        "name": "Дмитрий Скородько — портфолио",
+        "inLanguage": "ru-RU",
+        "publisher": { "@id": "https://shrumi.github.io/#person" }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://shrumi.github.io/#person",
+        "name": "Дмитрий Скородько",
+        "url": "https://shrumi.github.io/",
+        "jobTitle": "Промпт-инженер",
+        "description": "Промпт-инженер и vibe-кодер: системные промпты для LLM, автоматизация с ИИ, аудит промптов, обучение команд.",
+        "email": "mailto:shrumi@yandex.ru",
+        "knowsAbout": [
+          "Prompt Engineering", "Промпт-инжиниринг", "LLM", "ChatGPT", "Claude", "Gemini",
+          "Автоматизация с ИИ", "Vibe Coding", "Нейросети", "Языковые модели",
+          "Нейромузыка", "Suno", "Промо-страницы", "Лендинги"
+        ],
+        "sameAs": [
+          "https://t.me/Shrumi",
+          "https://volgograd.hh.ru/resume/5ccfcb19ff0da6af110039ed1f357378524250",
+          "https://github.com/Shrumi"
+        ]
+      },
+      {
+        "@type": "CollectionPage",
+        "@id": "https://shrumi.github.io/#portfolio",
+        "url": "https://shrumi.github.io/#works",
+        "name": "Портфолио — Дмитрий Скородько",
+        "description": "Работы Дмитрия Скородько: интерактивные HTML-презентации, промо-страницы, десктопные инструменты и ИИ-решения.",
+        "inLanguage": "ru-RU",
+        "isPartOf": { "@id": "https://shrumi.github.io/#website" },
+        "about": { "@id": "https://shrumi.github.io/#person" },
+        "mainEntity": { "@id": "https://shrumi.github.io/#portfolio-list" }
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://shrumi.github.io/#portfolio-list",
+        "name": "Портфолио",
+        "numberOfItems": 4,
+        "itemListOrder": "https://schema.org/ItemListOrderAscending",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+              "@type": "CreativeWork",
+              "name": "«Четыре школы полного привода»",
+              "url": "https://shrumi.github.io/PolnyPrivod/",
+              "description": "Интерактивная HTML-презентация о том, как Япония, Корея, Америка и Германия делили момент между колёсами в 1995–2007: три типа систем, четыре приоритета и один общий тренд — от механики к электронике.",
+              "inLanguage": "ru-RU",
+              "creator": { "@id": "https://shrumi.github.io/#person" }
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+              "@type": "CreativeWork",
+              "name": "«Осень. Сказочный чертог»",
+              "url": "https://shrumi.github.io/Osen/",
+              "description": "Промо-страница сингла нейромузыканта ShrUmi DjAga: музыкальное прочтение стихотворения Бориса Пастернака из альбома «Электролес».",
+              "inLanguage": "ru-RU",
+              "creator": { "@id": "https://shrumi.github.io/#person" }
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+              "@type": "SoftwareApplication",
+              "name": "Suno Collection Keeper",
+              "description": "Инструмент для сбора коллекции песен, созданных в Suno: тексты, стили и обложки собираются в один аккуратный файл.",
+              "applicationCategory": "MultimediaApplication",
+              "operatingSystem": "Windows 10/11",
+              "downloadUrl": "https://github.com/Shrumi/suno-parser/releases/download/v4.20/SunoParserInstaller-4.20.exe",
+              "creator": { "@id": "https://shrumi.github.io/#person" }
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "item": {
+              "@type": "SoftwareApplication",
+              "name": "Калькулятор прайса фотосалона",
+              "description": "Калькулятор для администратора фото-салона: поиск услуг по двум буквам, авторасчёт чека, клавиатурный ввод без мыши и отчёт по кассе смены.",
+              "applicationCategory": "BusinessApplication",
+              "operatingSystem": "Windows 10/11",
+              "downloadUrl": "https://github.com/Shrumi/photon-calculator/releases/download/v1.0.0-demo/PhotonCalcDemo.exe",
+              "creator": { "@id": "https://shrumi.github.io/#person" }
+            }
+          }
+        ]
+      }
     ]
   }
   </script>
