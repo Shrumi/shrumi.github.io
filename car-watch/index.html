@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>car-watch — мониторинг автообъявлений | Shrumi DjAga</title>
+  <meta name="description" content="car-watch — локальный агент, который следит за объявлениями о продаже автомобилей на Drom, Avito и Auto.ru, отбирает по заданным параметрам и присылает находки в Telegram и на почту.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://shrumi.github.io/car-watch/">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .cw-wrap { max-width: var(--container-width); margin: 0 auto; padding: 4rem 1.25rem 5rem; }
+    .cw-back { display: inline-block; margin-bottom: 2rem; color: var(--color-muted); font-size: .9rem; }
+    .cw-back:hover { color: var(--color-green); }
+    .cw-title { font-size: clamp(2rem, 6vw, 3rem); font-weight: 800; letter-spacing: -.02em; }
+    .cw-lead { margin-top: 1rem; color: var(--color-muted); max-width: 62ch; font-size: 1.05rem; line-height: 1.6; }
+    .cw-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-top: 2.5rem; }
+    .cw-card {
+      padding: 1.5rem; border: 1px solid rgba(167,139,250,.18); border-radius: 12px;
+      background: rgba(255,255,255,.04);
+    }
+    .cw-card h2 { font-size: 1rem; color: var(--color-green); margin-bottom: .6rem; }
+    .cw-card p { color: var(--color-muted); font-size: .92rem; line-height: 1.55; }
+    .cw-actions { display: flex; flex-wrap: wrap; gap: .9rem; margin-top: 2.5rem; }
+    .cw-btn {
+      display: inline-block; padding: .85rem 1.6rem; border-radius: 10px;
+      background: var(--color-green); color: #06120c; font-weight: 700; text-decoration: none;
+    }
+    .cw-btn--ghost { background: transparent; border: 1px solid rgba(167,139,250,.35); color: var(--color-text); }
+    .cw-note { margin-top: 1.5rem; font-size: .85rem; color: var(--color-muted); }
+    .cw-list { margin: 1rem 0 0 1.1rem; color: var(--color-muted); font-size: .92rem; line-height: 1.7; }
+  </style>
+</head>
+<body>
+  <main class="cw-wrap">
+    <a class="cw-back" href="../">← Shrumi DjAga</a>
+
+    <h1 class="cw-title">car-watch</h1>
+    <p class="cw-lead">
+      Локальный агент, который следит за объявлениями о продаже автомобилей на Drom, Avito и Auto.ru,
+      отбирает машины по заданным параметрам и присылает находки в Telegram и на почту.
+      Работает на домашнем компьютере, данные никуда не уходят.
+    </p>
+
+    <div class="cw-grid">
+      <div class="cw-card">
+        <h2>Три источника</h2>
+        <p>Drom, Avito и Auto.ru в одном потоке. Кросс-сайтовые дубли одной машины подавляются, чтобы не получать три письма об одном объявлении.</p>
+      </div>
+      <div class="cw-card">
+        <h2>Гибкие профили</h2>
+        <p>Марка, модель, год, объём двигателя, КПП, топливо, ГБО, руль, цена и пробег. Профили добавляются и удаляются прямо в интерфейсе.</p>
+      </div>
+      <div class="cw-card">
+        <h2>Радиус и карта</h2>
+        <p>Поиск в радиусе до 5000 км от выбранного города. Радиальная карта показывает, где находятся найденные машины, с переходом к объявлению.</p>
+      </div>
+      <div class="cw-card">
+        <h2>Уведомления</h2>
+        <p>Telegram-бот, письмо на почту и Web Push в браузере. Сводка выгружается в HTML или PDF.</p>
+      </div>
+      <div class="cw-card">
+        <h2>Снятые с продажи</h2>
+        <p>Агент проверяет пропавшие из выдачи объявления и помечает снятые — чтобы не тратить время на проданные машины.</p>
+      </div>
+      <div class="cw-card">
+        <h2>Мобильный интерфейс</h2>
+        <p>PWA: устанавливается на телефон, работает как приложение, открывается внутри Telegram как Mini App.</p>
+      </div>
+    </div>
+
+    <div class="cw-actions">
+      <a class="cw-btn" href="https://shrumi-carwatch.loca.lt" target="_blank" rel="noopener">Открыть демо</a>
+      <a class="cw-btn cw-btn--ghost" href="../">Другие работы</a>
+    </div>
+
+    <p class="cw-note">
+      Демо работает на домашнем сервере через туннель — адрес может меняться.
+      Проект собран как локальное приложение на Python: FastAPI, SQLite, Playwright.
+    </p>
+  </main>
+</body>
+</html>
