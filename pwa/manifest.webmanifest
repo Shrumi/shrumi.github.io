@@ -1,0 +1,19 @@
+{
+  "name": "Suno Parser — отчёты",
+  "short_name": "Suno Parser",
+  "description": "Чтение отчётов и плеер песен с сервера Suno Parser в локальной сети",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#151410",
+  "theme_color": "#b8432c",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

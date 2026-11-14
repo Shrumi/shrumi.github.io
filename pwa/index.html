@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Suno Parser — отчёты</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#151410">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#151410; --panel:#1e1c17; --line:#332f27; --ink:#f3ede1; --muted:#a99e8b;
+    --accent:#b8432c; --ok:#3f7f4a; --warn:#c9a227;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    padding:16px 14px 32px;max-width:720px;margin:0 auto}
+  h1{font-size:19px;margin:0 0 2px;letter-spacing:.01em}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+  button{font:inherit;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink);padding:11px 14px;cursor:pointer}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  button:disabled{opacity:.5;cursor:default}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:12px 14px;margin:0 0 10px}
+  .card h2{font-size:15px;margin:0 0 4px;word-break:break-all}
+  .meta{color:var(--muted);font-size:12.5px}
+  .files{list-style:none;margin:10px 0 0;padding:0}
+  .files li{border-top:1px solid var(--line);padding:9px 0}
+  .files a{color:var(--ink);text-decoration:none;display:flex;justify-content:space-between;gap:10px}
+  .files a span{color:var(--accent)}
+  .status{font-size:13px;color:var(--muted);min-height:20px;margin:0 0 10px}
+  .warn{background:rgba(201,162,39,.12);border:1px solid var(--warn);
+    color:#e6d08a;border-radius:12px;padding:10px 12px;font-size:13px;margin:0 0 14px}
+  .badge{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    padding:2px 8px;border-radius:999px;background:rgba(63,127,74,.16);color:#8fd39a}
+  code{font-size:12.5px;color:var(--warn);word-break:break-all}
+</style>
+</head>
+<body>
+<h1>Suno Parser</h1>
+<p class="sub">Отчёты и плеер с сервера в вашей локальной сети</p>
+
+<div id="cert" class="warn" hidden>
+  <b>Один раз примите сертификат.</b> Страница открыта по HTTPS, поэтому браузер
+  пускает к серверу только по HTTPS. Откройте
+  <a id="certLink" href="#" style="color:#e6d08a">https://адрес:8766</a>,
+  нажмите «Дополнительно» → «Перейти на сайт» и вернитесь сюда — поиск заработает.
+</div>
+
+<div class="row">
+  <button class="primary" id="scan">Найти сервер</button>
+  <button id="install" hidden>Установить приложение</button>
+</div>
+<p class="status" id="status">Сервер ищется в сети 192.168.0.x / 192.168.1.x</p>
+<div id="list"></div>
+
+<script>
+const PORTS = [8766, 8765, 8767, 8768, 8769, 8770, 8771, 8772, 8773, 8774, 8775];
+const SUBNETS = ['192.168.0.', '192.168.1.', '192.168.2.', '192.168.31.'];
+const statusEl = document.getElementById('status');
+const listEl = document.getElementById('list');
+const certEl = document.getElementById('cert');
+const certLink = document.getElementById('certLink');
+
+function ping(url, ms = 700) {
+  return new Promise((resolve) => {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), ms);
+    fetch(url, { signal: ctl.signal, mode: 'cors' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { clearTimeout(t); resolve(j && j.app === 'suno-report' ? j : null); })
+      .catch(() => { clearTimeout(t); resolve(null); });
+  });
+}
+
+async function findServer() {
+  const btn = document.getElementById('scan');
+  btn.disabled = true;
+  listEl.innerHTML = '';
+  certEl.hidden = true;
+  let found = null;
+  let certProblem = null;
+  const hosts = [];
+  SUBNETS.forEach((sn) => { for (let i = 1; i <= 254; i++) hosts.push(sn + i); });
+  statusEl.textContent = 'Поиск… 0 из ' + hosts.length;
+  let done = 0;
+  const queue = hosts.slice();
+  async function worker() {
+    while (queue.length && !found) {
+      const ip = queue.shift();
+      for (const port of PORTS) {
+        const scheme = port === 8765 ? 'http' : 'https';
+        const info = await ping(scheme + '://' + ip + ':' + port + '/__suno/ping');
+        if (info) { found = { ip, port, scheme, info }; break; }
+        if (scheme === 'https' && !certProblem) certProblem = 'https://' + ip + ':' + port;
+      }
+      done++;
+      if (done % 8 === 0) statusEl.textContent = 'Поиск… ' + done + ' из ' + hosts.length;
+    }
+  }
+  await Promise.all(Array.from({ length: 24 }, worker));
+  btn.disabled = false;
+  if (!found) {
+    statusEl.textContent = 'Сервер не найден. Проверьте, что Suno Parser открыт и отчёт показан.';
+    if (certProblem) {
+      certEl.hidden = false;
+      certLink.href = certProblem;
+      certLink.textContent = certProblem;
+    }
+    return;
+  }
+  statusEl.textContent = 'Сервер найден: ' + found.ip + ':' + found.port;
+  renderServer(found);
+}
+
+function renderServer(f) {
+  const base = f.scheme + '://' + f.ip + ':' + f.port + '/';
+  const card = document.createElement('div');
+  card.className = 'card';
+  const files = (f.info.files || []);
+  card.innerHTML =
+    '<h2>' + f.ip + ' <span class="badge">онлайн</span></h2>' +
+    '<div class="meta">' + files.length + ' отчётов · ' + base + '</div>' +
+    '<ul class="files">' + files.map((n) =>
+      '<li><a href="' + base + encodeURIComponent(n) + '" target="_blank" rel="noopener">' +
+      n + '<span>открыть →</span></a></li>').join('') + '</ul>';
+  listEl.appendChild(card);
+  try { localStorage.setItem('suno.server', base); } catch (e) {}
+}
+
+document.getElementById('scan').addEventListener('click', findServer);
+
+// Install prompt (Chrome/Edge on Android)
+let deferred = null;
+const installBtn = document.getElementById('install');
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); deferred = e; installBtn.hidden = false;
+});
+installBtn.addEventListener('click', async () => {
+  if (!deferred) return;
+  deferred.prompt(); await deferred.userChoice; deferred = null; installBtn.hidden = true;
+});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
