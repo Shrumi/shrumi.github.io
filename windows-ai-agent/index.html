@@ -149,6 +149,13 @@
       background: var(--color-green); color: #06120c; font-size: 1.1rem; font-weight: 700;
     }
     .wa-foot { padding: 0 .9rem .8rem; font-size: .7rem; color: var(--color-muted); }
+    .wa-resize {
+      position: absolute; right: 0; bottom: 0; width: 18px; height: 18px;
+      cursor: nwse-resize; z-index: 3; touch-action: none;
+      background: linear-gradient(135deg, transparent 50%, rgba(167,139,250,.5) 50%);
+      border-bottom-right-radius: 16px;
+    }
+    .wa-resize:hover { background: linear-gradient(135deg, transparent 50%, rgba(52,211,153,.7) 50%); }
     @media (max-width: 480px) {
       .wa-launcher__text { display: none; }
       .wa-launcher { padding: .85rem; }

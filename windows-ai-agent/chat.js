@@ -191,6 +191,92 @@
 
   /* ---------- перетаскивание ---------- */
 
+  var MIN_W = 280, MIN_H = 320;
+
+  function clampSize(w, h) {
+    return {
+      w: Math.min(Math.max(MIN_W, w), window.innerWidth - 20),
+      h: Math.min(Math.max(MIN_H, h), window.innerHeight - 20)
+    };
+  }
+
+  function saveSize(panelEl) {
+    try {
+      localStorage.setItem('wa-size', JSON.stringify({
+        w: panelEl.offsetWidth,
+        h: panelEl.offsetHeight
+      }));
+    } catch (e) { /* приватный режим — молча игнорируем */ }
+  }
+
+  function restoreSize(panelEl) {
+    try {
+      var s = JSON.parse(localStorage.getItem('wa-size') || 'null');
+      if (s && s.w && s.h) {
+        var c = clampSize(s.w, s.h);
+        panelEl.style.width = c.w + 'px';
+        panelEl.style.height = c.h + 'px';
+        panelEl.style.maxHeight = 'none';
+      }
+    } catch (e) { /* повреждённое значение — игнорируем */ }
+  }
+
+  function makeResizable(panelEl, handle) {
+    var resizing = false, startX = 0, startY = 0, startW = 0, startH = 0;
+
+    function begin(x, y) {
+      var rect = panelEl.getBoundingClientRect();
+      resizing = true;
+      startX = x; startY = y;
+      startW = rect.width; startH = rect.height;
+      // фиксируем позицию, чтобы панель не прыгала при смене width/height
+      panelEl.style.left = rect.left + 'px';
+      panelEl.style.top = rect.top + 'px';
+      panelEl.style.right = 'auto';
+      panelEl.style.bottom = 'auto';
+    }
+
+    function apply(x, y) {
+      var c = clampSize(startW + (x - startX), startH + (y - startY));
+      panelEl.style.width = c.w + 'px';
+      panelEl.style.height = c.h + 'px';
+      panelEl.style.maxHeight = 'none';
+    }
+
+    handle.addEventListener('mousedown', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      begin(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      if (resizing) apply(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('mouseup', function () {
+      if (!resizing) return;
+      resizing = false;
+      saveSize(panelEl);
+    });
+
+    handle.addEventListener('touchstart', function (e) {
+      var t = e.touches[0];
+      begin(t.clientX, t.clientY);
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function (e) {
+      if (!resizing) return;
+      var t = e.touches[0];
+      apply(t.clientX, t.clientY);
+    }, { passive: true });
+
+    document.addEventListener('touchend', function () {
+      if (!resizing) return;
+      resizing = false;
+      saveSize(panelEl);
+    });
+  }
+
   function makeDraggable(panelEl, handle) {
     var dragging = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
@@ -269,6 +355,7 @@
           '<button class="wa-send" type="submit" aria-label="Отправить">→</button>' +
         '</form>' +
         '<p class="wa-foot">Поиск по 24 заметкам + бесплатная LLM. Не заменяет диагностику.</p>' +
+        '<div class="wa-resize" title="Изменить размер" aria-hidden="true"></div>' +
       '</section>';
     document.body.appendChild(root);
     return root;
@@ -307,6 +394,8 @@
     root.querySelector('.wa-close').addEventListener('click', closePanel);
 
     makeDraggable(panel, root.querySelector('.wa-head__drag'));
+    makeResizable(panel, root.querySelector('.wa-resize'));
+    restoreSize(panel);
 
     // внешние кнопки страницы
     ['wa-open-chat', 'wa-open-chat-2'].forEach(function (id) {
