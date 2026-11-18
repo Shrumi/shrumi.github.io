@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-помощник по установке Windows - MVP | Shrumi DjAga</title>
+  <meta name="description" content="AI-помощник по установке и настройке Windows: база знаний, гибридный поиск BM25 + векторный, реранкер, RAG-пайплайн. MVP-демо с открытым чатом.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://shrumi.github.io/windows-ai-agent/">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .wa-page { max-width: var(--container-width); margin: 0 auto; padding: 4rem 1.25rem 6rem; }
+    .wa-back { display: inline-block; margin-bottom: 2rem; color: var(--color-muted); font-size: .9rem; }
+    .wa-back:hover { color: var(--color-green); }
+    .wa-badge {
+      display: inline-block; padding: .3rem .7rem; border-radius: 999px; font-size: .72rem;
+      font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--color-green); border: 1px solid rgba(52,211,153,.4);
+      background: rgba(52,211,153,.08); margin-bottom: 1rem;
+    }
+    .wa-title { font-size: clamp(2rem, 6vw, 3rem); font-weight: 800; letter-spacing: -.02em; }
+    .wa-lead { margin-top: 1rem; color: var(--color-muted); max-width: 66ch; font-size: 1.05rem; line-height: 1.65; }
+    .wa-h2 { margin-top: 3.5rem; font-size: 1.5rem; font-weight: 700; }
+    .wa-h3 { margin-top: 2rem; font-size: 1.1rem; font-weight: 600; color: var(--color-green); }
+    .wa-p { margin-top: .9rem; color: var(--color-muted); line-height: 1.7; max-width: 72ch; }
+    .wa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.25rem; margin-top: 1.75rem; }
+    .wa-card {
+      padding: 1.5rem; border: 1px solid rgba(167,139,250,.18); border-radius: 12px;
+      background: rgba(255,255,255,.04);
+    }
+    .wa-card h3 { font-size: 1rem; color: var(--color-green); margin-bottom: .55rem; }
+    .wa-card p { color: var(--color-muted); font-size: .92rem; line-height: 1.6; }
+    .wa-card code { color: var(--color-violet-light); font-size: .85em; }
+    .wa-flow { margin-top: 1.75rem; display: flex; flex-direction: column; gap: .5rem; }
+    .wa-step {
+      display: flex; gap: 1rem; align-items: flex-start; padding: 1rem 1.25rem;
+      border-left: 2px solid rgba(52,211,153,.45); background: rgba(255,255,255,.03);
+      border-radius: 0 10px 10px 0;
+    }
+    .wa-step__num {
+      flex: 0 0 1.9rem; height: 1.9rem; border-radius: 50%; display: grid; place-items: center;
+      background: rgba(52,211,153,.14); color: var(--color-green); font-weight: 700; font-size: .85rem;
+    }
+    .wa-step__body strong { display: block; font-size: .95rem; margin-bottom: .2rem; }
+    .wa-step__body span { color: var(--color-muted); font-size: .9rem; line-height: 1.55; }
+    .wa-arrow { text-align: center; color: rgba(167,139,250,.5); font-size: 1.1rem; line-height: 1; }
+    .wa-list { margin: 1rem 0 0 1.15rem; color: var(--color-muted); font-size: .95rem; line-height: 1.75; }
+    .wa-list li::marker { color: var(--color-green); }
+    .wa-actions { display: flex; flex-wrap: wrap; gap: .9rem; margin-top: 2.5rem; }
+    .wa-btn {
+      display: inline-block; padding: .85rem 1.6rem; border-radius: 10px;
+      background: var(--color-green); color: #06120c; font-weight: 700; text-decoration: none;
+      border: none; cursor: pointer; font-size: 1rem;
+    }
+    .wa-btn--ghost { background: transparent; border: 1px solid rgba(167,139,250,.35); color: var(--color-text); }
+    .wa-note { margin-top: 1.5rem; font-size: .85rem; color: var(--color-muted); }
+    .wa-table { width: 100%; border-collapse: collapse; margin-top: 1.25rem; font-size: .9rem; }
+    .wa-table th, .wa-table td { text-align: left; padding: .65rem .8rem; border-bottom: 1px solid rgba(167,139,250,.15); }
+    .wa-table th { color: var(--color-green); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+    .wa-table td { color: var(--color-muted); }
+
+    /* --- виджет чата --- */
+    .wa-root { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 50; font-family: "Inter", system-ui, sans-serif; }
+    .wa-launcher {
+      display: flex; align-items: center; gap: .55rem; padding: .8rem 1.2rem;
+      border-radius: 999px; border: none; cursor: pointer;
+      background: var(--color-green); color: #06120c; font-weight: 700; font-size: .95rem;
+      box-shadow: 0 8px 28px rgba(52,211,153,.28);
+    }
+    .wa-launcher__icon {
+      width: 1.4rem; height: 1.4rem; border-radius: 50%; display: grid; place-items: center;
+      background: rgba(6,18,12,.18); font-size: .85rem;
+    }
+    .wa-panel {
+      position: absolute; right: 0; bottom: 4.2rem; width: min(380px, calc(100vw - 2.5rem));
+      max-height: min(560px, calc(100vh - 8rem)); display: flex; flex-direction: column;
+      background: #12121f; border: 1px solid rgba(167,139,250,.25); border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.55); overflow: hidden;
+    }
+    .wa-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .9rem 1rem; border-bottom: 1px solid rgba(167,139,250,.18);
+    }
+    .wa-head strong { font-size: .95rem; }
+    .wa-head__sub { display: block; font-size: .72rem; color: var(--color-muted); margin-top: .1rem; }
+    .wa-close { background: none; border: none; color: var(--color-muted); font-size: 1.4rem; cursor: pointer; line-height: 1; }
+    .wa-log { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: .75rem; }
+    .wa-msg { max-width: 92%; font-size: .88rem; line-height: 1.55; }
+    .wa-msg p { margin: 0 0 .4rem; }
+    .wa-msg--user { align-self: flex-end; background: rgba(52,211,153,.14); border: 1px solid rgba(52,211,153,.25); padding: .6rem .8rem; border-radius: 12px 12px 2px 12px; }
+    .wa-msg--bot { align-self: flex-start; background: rgba(255,255,255,.05); border: 1px solid rgba(167,139,250,.16); padding: .7rem .85rem; border-radius: 12px 12px 12px 2px; }
+    .wa-hint { color: var(--color-muted); font-size: .82rem; }
+    .wa-answer__title { color: var(--color-green); font-weight: 700; }
+    .wa-answer__section { color: var(--color-violet-light); font-size: .8rem; }
+    .wa-answer__body { color: var(--color-text); font-size: .85rem; }
+    .wa-answer__src, .wa-answer__more { color: var(--color-muted); font-size: .75rem; margin-top: .5rem; }
+    .wa-form { display: flex; gap: .5rem; padding: .75rem; border-top: 1px solid rgba(167,139,250,.18); }
+    .wa-input {
+      flex: 1; padding: .65rem .8rem; border-radius: 9px; border: 1px solid rgba(167,139,250,.25);
+      background: rgba(255,255,255,.05); color: var(--color-text); font-size: .88rem; outline: none;
+    }
+    .wa-input:focus { border-color: rgba(52,211,153,.5); }
+    .wa-send {
+      width: 2.6rem; border-radius: 9px; border: none; cursor: pointer;
+      background: var(--color-green); color: #06120c; font-size: 1.1rem; font-weight: 700;
+    }
+    .wa-foot { padding: 0 .9rem .8rem; font-size: .7rem; color: var(--color-muted); }
+    @media (max-width: 480px) {
+      .wa-launcher__text { display: none; }
+      .wa-launcher { padding: .85rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wa-page">
+    <a class="wa-back" href="../">← Shrumi DjAga</a>
+
+    <span class="wa-badge">MVP · демо</span>
+    <h1 class="wa-title">AI-помощник по установке Windows</h1>
+    <p class="wa-lead">
+      Ассистент, который отвечает на вопросы по установке и настройке Windows
+      на основе собственной базы знаний: ошибки установки, BIOS/UEFI, драйверы,
+      BSOD, диски, активация. Ниже — как устроен пайплайн и что уже работает.
+    </p>
+
+    <div class="wa-actions">
+      <button class="wa-btn" type="button" id="wa-open-chat">Открыть чат</button>
+      <a class="wa-btn wa-btn--ghost" href="#pipeline">Как это работает</a>
+    </div>
+
+    <h2 class="wa-h2" id="what">Что это</h2>
+    <p class="wa-p">
+      Классический RAG-контур: документы → чанки → эмбеддинги → гибридный поиск →
+      реранкер → ответ со ссылкой на источник. Задача — не «поговорить про Windows»,
+      а находить конкретное решение по коду ошибки или симптому и показывать,
+      откуда оно взято.
+    </p>
+    <p class="wa-p">
+      Сейчас это <strong>MVP</strong>: база из 24 заметок, локальный поиск,
+      демо-виджет в браузере. Генерация ответа языковой моделью — следующий этап,
+      в демо ответ собирается из найденных фрагментов.
+    </p>
+
+    <h2 class="wa-h2" id="parts">Составные части</h2>
+    <div class="wa-grid">
+      <div class="wa-card">
+        <h3>База знаний</h3>
+        <p>24 заметки в 8 разделах: установка, первичная настройка, сеть, обслуживание,
+        диагностика, диски, автоматизация, софт. Markdown с командами и кодами ошибок.</p>
+      </div>
+      <div class="wa-card">
+        <h3>Чанкинг</h3>
+        <p>Разбиение по заголовкам <code>##</code> и <code>###</code>, а не по символам.
+        Заголовок склеивается в контекст чанка: «Windows &gt; Диагностика &gt; BSOD».</p>
+      </div>
+      <div class="wa-card">
+        <h3>Эмбеддинги</h3>
+        <p>Модель <code>multilingual-e5-base</code>, 768 измерений, косинусное расстояние.
+        Векторы хранятся в Qdrant.</p>
+      </div>
+      <div class="wa-card">
+        <h3>Гибридный поиск</h3>
+        <p>Dense-поиск по смыслу + BM25 по точным токенам. Слияние через RRF.
+        Коды ошибок вроде <code>0x80070002</code> находит именно BM25.</p>
+      </div>
+      <div class="wa-card">
+        <h3>Реранкер</h3>
+        <p><code>jina-reranker-v2-base-multilingual</code> пересортировывает топ-20
+        кандидатов и оставляет 5. Отсекает «похожее, но не то».</p>
+      </div>
+      <div class="wa-card">
+        <h3>Виджет</h3>
+        <p>Всплывающий чат на этой странице. В демо — BM25-поиск по базе прямо
+        в браузере, без сервера.</p>
+      </div>
+    </div>
+
+    <h2 class="wa-h2" id="pipeline">Логическая цепочка пайплайна</h2>
+    <div class="wa-flow">
+      <div class="wa-step">
+        <span class="wa-step__num">1</span>
+        <div class="wa-step__body">
+          <strong>Сбор и структурирование</strong>
+          <span>Материалы раскладываются по жизненному циклу системы: установка → настройка → сеть → обслуживание → диагностика → диски → автоматизация → софт.</span>
+        </div>
+      </div>
+      <div class="wa-arrow">↓</div>
+      <div class="wa-step">
+        <span class="wa-step__num">2</span>
+        <div class="wa-step__body">
+          <strong>Извлечение и чанкинг</strong>
+          <span>Markdown режется по заголовкам, в каждый чанк добавляется путь раздела и метаданные: файл, дата, тип.</span>
+        </div>
+      </div>
+      <div class="wa-arrow">↓</div>
+      <div class="wa-step">
+        <span class="wa-step__num">3</span>
+        <div class="wa-step__body">
+          <strong>Индексация</strong>
+          <span>Чанки превращаются в векторы и складываются в Qdrant. Параллельно строится BM25-индекс по сырому тексту.</span>
+        </div>
+      </div>
+      <div class="wa-arrow">↓</div>
+      <div class="wa-step">
+        <span class="wa-step__num">4</span>
+        <div class="wa-step__body">
+          <strong>Поиск</strong>
+          <span>Запрос идёт двумя путями: векторный (смысл) и лексический (точные коды, команды, имена файлов). Результаты сливаются через RRF.</span>
+        </div>
+      </div>
+      <div class="wa-arrow">↓</div>
+      <div class="wa-step">
+        <span class="wa-step__num">5</span>
+        <div class="wa-step__body">
+          <strong>Реранкинг</strong>
+          <span>Кросс-энкодер оценивает пары «запрос — фрагмент» и переставляет топ. Это дороже, но точнее векторного сходства.</span>
+        </div>
+      </div>
+      <div class="wa-arrow">↓</div>
+      <div class="wa-step">
+        <span class="wa-step__num">6</span>
+        <div class="wa-step__body">
+          <strong>Ответ</strong>
+          <span>Пользователь получает решение и ссылку на источник. Если релевантных фрагментов нет — честное «в базе нет», без выдумывания.</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="wa-h2" id="mvp">Что входит в MVP</h2>
+    <table class="wa-table">
+      <thead>
+        <tr><th>Компонент</th><th>Статус</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>База знаний, 24 заметки</td><td>готово</td></tr>
+        <tr><td>Чанкинг по заголовкам</td><td>готово</td></tr>
+        <tr><td>Векторный индекс Qdrant</td><td>готово</td></tr>
+        <tr><td>BM25 + RRF</td><td>готово</td></tr>
+        <tr><td>Реранкер jina-v2</td><td>готово</td></tr>
+        <tr><td>Виджет чата на сайте</td><td>демо, поиск в браузере</td></tr>
+        <tr><td>Генерация ответа LLM</td><td>следующий этап</td></tr>
+        <tr><td>Обратная связь и дообучение</td><td>следующий этап</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="wa-h3">Ограничения демо</h3>
+    <ul class="wa-list">
+      <li>Виджет ищет по предзагруженному JSON, а не обращается к Qdrant — GitHub Pages не держит бэкенд.</li>
+      <li>Ответ собирается из найденного фрагмента, без переформулировки моделью.</li>
+      <li>База небольшая: 24 заметки, 185 чанков. На реальном корпусе нужен мониторинг качества.</li>
+    </ul>
+
+    <h3 class="wa-h3">Стек</h3>
+    <ul class="wa-list">
+      <li>Python 3.12, sentence-transformers, rank_bm25</li>
+      <li>Qdrant 1.20 (векторная БД) + собственный прокси для Web UI</li>
+      <li>multilingual-e5-base (эмбеддинги), jina-reranker-v2-base-multilingual (реранкинг)</li>
+      <li>Статический сайт на GitHub Pages</li>
+    </ul>
+
+    <div class="wa-actions">
+      <button class="wa-btn" type="button" id="wa-open-chat-2">Попробовать чат</button>
+      <a class="wa-btn wa-btn--ghost" href="../">← Все проекты</a>
+    </div>
+    <p class="wa-note">
+      Демо работает офлайн после загрузки страницы. Реальная диагностика требует
+      доступа к системе — помощник подсказывает, но не заменяет специалиста.
+    </p>
+  </main>
+
+  <script src="chat.js"></script>
+  <script>
+    (function () {
+      function openChat() {
+        var panel = document.querySelector('.wa-panel');
+        var input = document.querySelector('.wa-input');
+        if (panel) { panel.hidden = false; if (input) input.focus(); }
+      }
+      var a = document.getElementById('wa-open-chat');
+      var b = document.getElementById('wa-open-chat-2');
+      if (a) a.addEventListener('click', openChat);
+      if (b) b.addEventListener('click', openChat);
+    })();
+  </script>
+</body>
+</html>
