@@ -1,6 +1,5 @@
-/* Suno Parser PWA: the shell is cached so the app opens offline.
-   Reports themselves live on the local server and stay network-only. */
-const CACHE = 'suno-pwa-v1';
+/* Suno Parser PWA: only the shell is cached; reports are always live. */
+const CACHE = 'suno-pwa-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', (event) => {
@@ -17,8 +16,9 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
-  // Never intercept the local server: reports must always be fresh.
   if (url.origin !== self.location.origin) return;
+  // Discovery and reports must never be served from the cache.
+  if (url.pathname.startsWith('/__suno/')) return;
   event.respondWith(
     caches.match(event.request).then((hit) => hit || fetch(event.request))
   );

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Suno Parser — отчёты</title>
+<title>Suno Parser - отчёты</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#151410">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
@@ -16,13 +16,16 @@
   body{margin:0;background:var(--bg);color:var(--ink);
     font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
     padding:16px 14px 32px;max-width:720px;margin:0 auto}
-  h1{font-size:19px;margin:0 0 2px;letter-spacing:.01em}
+  h1{font-size:19px;margin:0 0 2px}
   .sub{color:var(--muted);font-size:13px;margin:0 0 16px}
   button{font:inherit;border-radius:10px;border:1px solid var(--line);
     background:var(--panel);color:var(--ink);padding:11px 14px;cursor:pointer}
   button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
   button:disabled{opacity:.5;cursor:default}
+  input{font:inherit;width:100%;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink);padding:10px 12px}
   .row{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .row > *{flex:1 1 160px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
     padding:12px 14px;margin:0 0 10px}
   .card h2{font-size:15px;margin:0 0 4px;word-break:break-all}
@@ -41,99 +44,111 @@
 </head>
 <body>
 <h1>Suno Parser</h1>
-<p class="sub">Отчёты и плеер с сервера в вашей локальной сети</p>
+<p class="sub" id="sub">Отчёты с компьютера в вашей сети</p>
 
 <div id="cert" class="warn" hidden>
-  <b>Один раз примите сертификат.</b> Страница открыта по HTTPS, поэтому браузер
-  пускает к серверу только по HTTPS. Откройте
-  <a id="certLink" href="#" style="color:#e6d08a">https://адрес:8766</a>,
-  нажмите «Дополнительно» → «Перейти на сайт» и вернитесь сюда — поиск заработает.
+  <b>Нужен разовый приём сертификата.</b> Откройте адрес по HTTPS, чтобы браузер
+  разрешил запросы. <a id="certLink" href="#" style="color:#e6d08a">https://…</a>,
+  затем «Дополнительно» → «Перейти на сайт».
 </div>
 
-<div class="row">
-  <button class="primary" id="scan">Найти сервер</button>
-  <button id="install" hidden>Установить приложение</button>
+<div class="row" id="manual">
+  <input id="host" inputmode="numeric" placeholder="IP компьютера, например 192.168.186.5">
+  <button class="primary" id="scan">Найти отчёты</button>
 </div>
-<p class="status" id="status">Сервер ищется в сети 192.168.0.x / 192.168.1.x</p>
+<button id="install" hidden style="margin-bottom:14px">Установить приложение</button>
+<p class="status" id="status">Ищу сервер парсера…</p>
 <div id="list"></div>
 
 <script>
-const PORTS = [8766, 8765, 8767, 8768, 8769, 8770, 8771, 8772, 8773, 8774, 8775];
-const SUBNETS = ['192.168.0.', '192.168.1.', '192.168.2.', '192.168.31.'];
+const PORTS = [8774, 8765, 8766, 8767, 8768, 8769, 8770, 8771, 8772, 8773, 8775];
 const statusEl = document.getElementById('status');
 const listEl = document.getElementById('list');
 const certEl = document.getElementById('cert');
 const certLink = document.getElementById('certLink');
+const hostInput = document.getElementById('host');
+const manualRow = document.getElementById('manual');
 
-function ping(url, ms = 700) {
+function ping(url, ms = 900) {
   return new Promise((resolve) => {
     const ctl = new AbortController();
     const t = setTimeout(() => ctl.abort(), ms);
-    fetch(url, { signal: ctl.signal, mode: 'cors' })
+    fetch(url, { signal: ctl.signal, mode: 'cors', cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => { clearTimeout(t); resolve(j && j.app === 'suno-report' ? j : null); })
       .catch(() => { clearTimeout(t); resolve(null); });
   });
 }
 
+// The same page is served by the parser itself (http://<ip>:8774/) and from
+// GitHub Pages. On the parser origin we already know the address: no scan.
+async function bootstrap() {
+  const here = location.protocol + '//' + location.host;
+  if (location.port === '8774' || location.port === '8775' || location.protocol === 'http:' && location.port) {
+    const info = await ping(here + '/__suno/ping', 2500);
+    if (info) { renderServer({ scheme: location.protocol.replace(':', ''), ip: location.hostname, port: location.port, info }); return; }
+  }
+  const saved = (() => { try { return localStorage.getItem('suno.host') || ''; } catch (e) { return ''; } })();
+  if (saved) hostInput.value = saved;
+  statusEl.textContent = 'Введите IP компьютера с парсером — или откройте приложение по адресу http://IP:8774/';
+}
+
+async function probeHost(ip) {
+  const clean = String(ip || '').trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+  if (!clean) return null;
+  for (const port of PORTS) {
+    const scheme = (port === 8765 || port === 8774) ? 'http' : 'https';
+    const info = await ping(scheme + '://' + clean + ':' + port + '/__suno/ping');
+    if (info) return { scheme, ip: clean, port, info };
+    if (scheme === 'https' && !certEl.dataset.shown) {
+      certEl.dataset.shown = '1';
+      certEl.hidden = false;
+      certLink.href = 'https://' + clean + ':' + port;
+      certLink.textContent = 'https://' + clean + ':' + port;
+    }
+  }
+  return null;
+}
+
 async function findServer() {
   const btn = document.getElementById('scan');
   btn.disabled = true;
   listEl.innerHTML = '';
-  certEl.hidden = true;
-  let found = null;
-  let certProblem = null;
-  const hosts = [];
-  SUBNETS.forEach((sn) => { for (let i = 1; i <= 254; i++) hosts.push(sn + i); });
-  statusEl.textContent = 'Поиск… 0 из ' + hosts.length;
-  let done = 0;
-  const queue = hosts.slice();
-  async function worker() {
-    while (queue.length && !found) {
-      const ip = queue.shift();
-      for (const port of PORTS) {
-        const scheme = port === 8765 ? 'http' : 'https';
-        const info = await ping(scheme + '://' + ip + ':' + port + '/__suno/ping');
-        if (info) { found = { ip, port, scheme, info }; break; }
-        if (scheme === 'https' && !certProblem) certProblem = 'https://' + ip + ':' + port;
-      }
-      done++;
-      if (done % 8 === 0) statusEl.textContent = 'Поиск… ' + done + ' из ' + hosts.length;
-    }
-  }
-  await Promise.all(Array.from({ length: 24 }, worker));
+  const ip = hostInput.value.trim();
+  statusEl.textContent = ip ? 'Проверяю ' + ip + '…' : 'Укажите IP компьютера';
+  const found = ip ? await probeHost(ip) : null;
   btn.disabled = false;
   if (!found) {
-    statusEl.textContent = 'Сервер не найден. Проверьте, что Suno Parser открыт и отчёт показан.';
-    if (certProblem) {
-      certEl.hidden = false;
-      certLink.href = certProblem;
-      certLink.textContent = certProblem;
-    }
+    statusEl.textContent = ip
+      ? 'Сервер не найден. Проверьте, что парсер запущен и телефон в той же сети.'
+      : 'Введите IP компьютера с парсером.';
     return;
   }
-  statusEl.textContent = 'Сервер найден: ' + found.ip + ':' + found.port;
   renderServer(found);
 }
 
 function renderServer(f) {
+  listEl.innerHTML = '';
   const base = f.scheme + '://' + f.ip + ':' + f.port + '/';
+  const pwaBase = f.info.pwa ? f.scheme + '://' + f.ip + ':' + f.info.pwa + '/' : base;
+  try { localStorage.setItem('suno.host', f.ip); } catch (e) {}
+  statusEl.textContent = 'Сервер найден: ' + f.ip + ':' + f.port;
+  const files = (f.info.files || []);
   const card = document.createElement('div');
   card.className = 'card';
-  const files = (f.info.files || []);
   card.innerHTML =
-    '<h2>' + f.ip + ' <span class="badge">онлайн</span></h2>' +
+    '<h2>' + f.ip + ' <span class="badge">' + (f.info.pwa ? 'PWA' : 'отчёты') + '</span></h2>' +
     '<div class="meta">' + files.length + ' отчётов · ' + base + '</div>' +
     '<ul class="files">' + files.map((n) =>
       '<li><a href="' + base + encodeURIComponent(n) + '" target="_blank" rel="noopener">' +
-      n + '<span>открыть →</span></a></li>').join('') + '</ul>';
+      n + '<span>открыть →</span></a></li>').join('') + '</ul>' +
+    (pwaBase !== base ? '<p class="meta" style="margin-top:10px">Адрес приложения: <code>' + pwaBase + '</code></p>' : '');
   listEl.appendChild(card);
-  try { localStorage.setItem('suno.server', base); } catch (e) {}
 }
 
 document.getElementById('scan').addEventListener('click', findServer);
+hostInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') findServer(); });
 
-// Install prompt (Chrome/Edge on Android)
 let deferred = null;
 const installBtn = document.getElementById('install');
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -147,6 +162,7 @@ installBtn.addEventListener('click', async () => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
+bootstrap();
 </script>
 </body>
 </html>

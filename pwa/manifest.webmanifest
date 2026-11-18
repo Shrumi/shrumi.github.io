@@ -1,8 +1,8 @@
 {
-  "name": "Suno Parser — отчёты",
+  "name": "Suno Parser - отчёты",
   "short_name": "Suno Parser",
-  "description": "Чтение отчётов и плеер песен с сервера Suno Parser в локальной сети",
-  "start_url": "./index.html",
+  "description": "Отчёты и плеер коллекции Suno Parser в локальной сети",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
