@@ -276,6 +276,16 @@
 
   function openPanel() {
     if (!panel) return;
+    // если панель утащили за пределы экрана — вернуть в видимую область
+    var r = panel.getBoundingClientRect();
+    var offscreen = r.right < 40 || r.bottom < 40 ||
+      r.left > window.innerWidth - 40 || r.top > window.innerHeight - 40;
+    if (offscreen) {
+      panel.style.left = '';
+      panel.style.top = '';
+      panel.style.right = '1.25rem';
+      panel.style.bottom = '5.5rem';
+    }
     panel.hidden = false;
     if (input) input.focus();
   }

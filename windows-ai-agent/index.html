@@ -73,11 +73,13 @@
       background: rgba(6,18,12,.18); font-size: .85rem;
     }
     .wa-panel {
-      position: absolute; right: 0; bottom: 4.2rem; width: min(380px, calc(100vw - 2.5rem));
+      position: fixed; right: 1.25rem; bottom: 5.5rem; width: min(380px, calc(100vw - 2.5rem));
       max-height: min(560px, calc(100vh - 8rem)); display: flex; flex-direction: column;
       background: #12121f; border: 1px solid rgba(167,139,250,.25); border-radius: 16px;
       box-shadow: 0 20px 60px rgba(0,0,0,.55); overflow: hidden;
     }
+    /* авторский display:flex перебивает браузерный [hidden] — возвращаем скрытие */
+    .wa-panel[hidden] { display: none; }
     .wa-head {
       display: flex; justify-content: space-between; align-items: center;
       padding: .9rem 1rem; border-bottom: 1px solid rgba(167,139,250,.18);
