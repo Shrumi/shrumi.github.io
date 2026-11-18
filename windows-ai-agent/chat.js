@@ -1,13 +1,20 @@
-/* Демо-виджет AI-помощника по установке Windows.
-   Работает полностью в браузере: BM25-поиск по kb.json, без бэкенда. */
+/* AI-помощник по установке Windows.
+   Поиск: BM25 по kb.json в браузере. Ответ: бесплатная LLM (Pollinations, без ключа)
+   с fallback на локальный фрагмент, если API недоступен. */
 (function () {
   'use strict';
 
   var KB_URL = 'kb.json';
+  var LLM_URL = 'https://text.pollinations.ai/openai';
+  var LLM_MODEL = 'openai';
+  var LLM_TIMEOUT = 25000;
   var K1 = 1.5, B = 0.75;
   var TOKEN_RE = /[a-zA-Zа-яА-ЯёЁ0-9_\-\.]+/g;
 
   var docs = [], idf = {}, avgdl = 0, N = 0, ready = false;
+  var panel, log, input, modal;
+
+  /* ---------- поиск ---------- */
 
   function tokenize(text) {
     return (String(text).toLowerCase().match(TOKEN_RE) || []);
@@ -49,12 +56,197 @@
       .slice(0, top || 3);
   }
 
+  /* ---------- LLM ---------- */
+
+  function buildPrompt(query, hits) {
+    var ctx = hits.map(function (h, i) {
+      return '[' + (i + 1) + '] ' + h.doc.title + ' / ' + h.doc.section + '\n' + h.doc.text;
+    }).join('\n\n');
+    return 'Ты помощник по установке и настройке Windows. Отвечай ТОЛЬКО по контексту ниже. ' +
+      'Если ответа в контексте нет — скажи: «В базе нет подходящего материала». ' +
+      'Отвечай по-русски, кратко: 3–6 предложений, по делу, с конкретными командами, если они есть.\n\n' +
+      'КОНТЕКСТ:\n' + ctx + '\n\nВОПРОС: ' + query;
+  }
+
+  function askLLM(query, hits) {
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, LLM_TIMEOUT);
+    return fetch(LLM_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: LLM_MODEL,
+        messages: [
+          { role: 'system', content: 'Ты технический помощник по Windows. Отвечай кратко и по делу.' },
+          { role: 'user', content: buildPrompt(query, hits) }
+        ],
+        max_tokens: 500,
+        temperature: 0.3
+      })
+    }).then(function (r) {
+      clearTimeout(timer);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function (j) {
+      var msg = j.choices && j.choices[0] && j.choices[0].message;
+      var text = msg && msg.content;
+      if (!text) throw new Error('empty');
+      return String(text).trim();
+    });
+  }
+
+  /* ---------- утилиты ---------- */
+
   function el(tag, cls, text) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
     if (text != null) e.textContent = text;
     return e;
   }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function addMsg(role, html) {
+    var m = el('div', 'wa-msg wa-msg--' + role);
+    m.innerHTML = html;
+    log.appendChild(m);
+    log.scrollTop = log.scrollHeight;
+    return m;
+  }
+
+  /* ---------- модалка с полным текстом ---------- */
+
+  function openFull(doc) {
+    if (!modal) {
+      modal = el('div', 'wa-modal');
+      modal.innerHTML =
+        '<div class="wa-modal__box" role="dialog" aria-modal="true">' +
+          '<header class="wa-modal__head">' +
+            '<div><strong class="wa-modal__title"></strong>' +
+            '<span class="wa-modal__sub"></span></div>' +
+            '<button class="wa-modal__close" type="button" aria-label="Закрыть">×</button>' +
+          '</header>' +
+          '<div class="wa-modal__body"></div>' +
+          '<footer class="wa-modal__foot"></footer>' +
+        '</div>';
+      document.body.appendChild(modal);
+      modal.querySelector('.wa-modal__close').addEventListener('click', closeFull);
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeFull();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('is-open')) closeFull();
+      });
+    }
+    modal.querySelector('.wa-modal__title').textContent = doc.title;
+    modal.querySelector('.wa-modal__sub').textContent =
+      (doc.section ? doc.section + ' · ' : '') + doc.category;
+    modal.querySelector('.wa-modal__body').textContent = doc.text;
+    modal.querySelector('.wa-modal__foot').textContent = 'Источник: ' + doc.path;
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFull() {
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  /* ---------- ответ ---------- */
+
+  function renderAnswer(query, hits, llmText) {
+    var best = hits[0].doc;
+    var html = '';
+    if (llmText) {
+      html += '<div class="wa-answer__body">' +
+        escapeHtml(llmText).replace(/\n/g, '<br>') + '</div>';
+    } else {
+      var body = best.text.replace(/\n{2,}/g, '\n').trim();
+      if (body.length > 600) body = body.slice(0, 600) + '…';
+      html += '<div class="wa-answer__body">' + escapeHtml(body).replace(/\n/g, '<br>') + '</div>';
+    }
+    html += '<button class="wa-answer__link" type="button" data-doc="' + best.id + '">' +
+      'Читать полностью: ' + escapeHtml(best.title) + ' →</button>';
+    html += '<p class="wa-answer__src">Источник: ' + escapeHtml(best.category) +
+      ' / ' + escapeHtml(best.path) + '</p>';
+    return html;
+  }
+
+  function bindAnswerLinks(container) {
+    container.querySelectorAll('.wa-answer__link').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = Number(btn.getAttribute('data-doc'));
+        var found = null;
+        docs.forEach(function (x) { if (x.d.id === id) found = x.d; });
+        if (found) openFull(found);
+      });
+    });
+  }
+
+  /* ---------- перетаскивание ---------- */
+
+  function makeDraggable(panelEl, handle) {
+    var dragging = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+    handle.addEventListener('mousedown', function (e) {
+      if (e.target.closest('button')) return;
+      var rect = panelEl.getBoundingClientRect();
+      panelEl.style.left = rect.left + 'px';
+      panelEl.style.top = rect.top + 'px';
+      panelEl.style.right = 'auto';
+      panelEl.style.bottom = 'auto';
+      dragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startLeft = rect.left;
+      startTop = rect.top;
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      var w = panelEl.offsetWidth, h = panelEl.offsetHeight;
+      var left = Math.min(Math.max(0, startLeft + e.clientX - startX), window.innerWidth - w);
+      var top = Math.min(Math.max(0, startTop + e.clientY - startY), window.innerHeight - h);
+      panelEl.style.left = left + 'px';
+      panelEl.style.top = top + 'px';
+    });
+
+    document.addEventListener('mouseup', function () { dragging = false; });
+
+    handle.addEventListener('touchstart', function (e) {
+      if (e.target.closest('button')) return;
+      var t = e.touches[0];
+      var rect = panelEl.getBoundingClientRect();
+      panelEl.style.left = rect.left + 'px';
+      panelEl.style.top = rect.top + 'px';
+      panelEl.style.right = 'auto';
+      panelEl.style.bottom = 'auto';
+      dragging = true;
+      startX = t.clientX; startY = t.clientY;
+      startLeft = rect.left; startTop = rect.top;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function (e) {
+      if (!dragging) return;
+      var t = e.touches[0];
+      var w = panelEl.offsetWidth, h = panelEl.offsetHeight;
+      var left = Math.min(Math.max(0, startLeft + t.clientX - startX), window.innerWidth - w);
+      var top = Math.min(Math.max(0, startTop + t.clientY - startY), window.innerHeight - h);
+      panelEl.style.left = left + 'px';
+      panelEl.style.top = top + 'px';
+    }, { passive: true });
+
+    document.addEventListener('touchend', function () { dragging = false; });
+  }
+
+  /* ---------- UI ---------- */
 
   function buildUI() {
     var root = el('div', 'wa-root');
@@ -65,7 +257,10 @@
       '</button>' +
       '<section class="wa-panel" aria-label="AI-помощник по Windows" hidden>' +
         '<header class="wa-head">' +
-          '<div><strong>AI-помощник</strong><span class="wa-head__sub">установка Windows · MVP-демо</span></div>' +
+          '<div class="wa-head__drag">' +
+            '<strong>AI-помощник</strong>' +
+            '<span class="wa-head__sub">установка Windows · MVP</span>' +
+          '</div>' +
           '<button class="wa-close" type="button" aria-label="Закрыть">×</button>' +
         '</header>' +
         '<div class="wa-log" role="log" aria-live="polite"></div>' +
@@ -73,96 +268,86 @@
           '<input class="wa-input" type="text" placeholder="Например: ошибка 0x80070002" autocomplete="off">' +
           '<button class="wa-send" type="submit" aria-label="Отправить">→</button>' +
         '</form>' +
-        '<p class="wa-foot">Демо: поиск по 24 заметкам базы. Не заменяет диагностику.</p>' +
+        '<p class="wa-foot">Поиск по 24 заметкам + бесплатная LLM. Не заменяет диагностику.</p>' +
       '</section>';
     document.body.appendChild(root);
     return root;
   }
 
-  function addMsg(log, role, html) {
-    var m = el('div', 'wa-msg wa-msg--' + role);
-    m.innerHTML = html;
-    log.appendChild(m);
-    log.scrollTop = log.scrollHeight;
-    return m;
+  function openPanel() {
+    if (!panel) return;
+    panel.hidden = false;
+    if (input) input.focus();
   }
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-
-  function answer(query) {
-    var hits = search(query, 3);
-    if (!hits.length) {
-      return '<p>В базе нет подходящего материала. Попробуйте уточнить: код ошибки, ' +
-        'название раздела или симптом.</p>';
-    }
-    var best = hits[0].doc;
-    var body = best.text.replace(/\n{2,}/g, '\n').trim();
-    if (body.length > 700) body = body.slice(0, 700) + '…';
-    var html = '<p class="wa-answer__title">' + escapeHtml(best.title) + '</p>';
-    if (best.section) html += '<p class="wa-answer__section">' + escapeHtml(best.section) + '</p>';
-    html += '<div class="wa-answer__body">' + escapeHtml(body).replace(/\n/g, '<br>') + '</div>';
-    html += '<p class="wa-answer__src">Источник: ' + escapeHtml(best.category) +
-      ' / ' + escapeHtml(best.path) + '</p>';
-    if (hits.length > 1) {
-      var seen = {};
-      seen[best.title] = true;
-      var more = [];
-      hits.slice(1).forEach(function (h) {
-        if (!seen[h.doc.title]) { seen[h.doc.title] = true; more.push(h.doc.title); }
-      });
-      if (more.length) {
-        html += '<p class="wa-answer__more">Ещё по теме: ' +
-          more.map(escapeHtml).join('; ') + '</p>';
-      }
-    }
-    return html;
+  function closePanel() {
+    if (panel) panel.hidden = true;
   }
 
   function init() {
     var root = buildUI();
-    var panel = root.querySelector('.wa-panel');
-    var log = root.querySelector('.wa-log');
+    panel = root.querySelector('.wa-panel');
+    log = root.querySelector('.wa-log');
+    input = root.querySelector('.wa-input');
     var form = root.querySelector('.wa-form');
-    var input = root.querySelector('.wa-input');
 
     root.querySelector('.wa-launcher').addEventListener('click', function () {
-      panel.hidden = !panel.hidden;
-      if (!panel.hidden) input.focus();
+      if (panel.hidden) openPanel(); else closePanel();
     });
-    root.querySelector('.wa-close').addEventListener('click', function () {
-      panel.hidden = true;
-    });
+    root.querySelector('.wa-close').addEventListener('click', closePanel);
 
-    addMsg(log, 'bot',
-      '<p>Привет! Я демо-помощник по установке Windows. Спросите про ошибку, ' +
-      'BIOS, драйверы, BSOD или диск.</p>' +
-      '<p class="wa-hint">Попробуйте: «ошибка 0x80070002», «не видит диск при установке», ' +
-      '«синий экран».</p>');
+    makeDraggable(panel, root.querySelector('.wa-head__drag'));
+
+    // внешние кнопки страницы
+    ['wa-open-chat', 'wa-open-chat-2'].forEach(function (id) {
+      var b = document.getElementById(id);
+      if (b) b.addEventListener('click', openPanel);
+    });
+    window.WAOpenChat = openPanel;
+
+    addMsg('bot',
+      '<p>Привет! Спросите про ошибку установки, BIOS, драйверы, BSOD или диск.</p>' +
+      '<p class="wa-hint">Например: «ошибка 0x80070002», «не видит диск при установке», «синий экран».</p>');
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var q = input.value.trim();
       if (!q) return;
-      addMsg(log, 'user', '<p>' + escapeHtml(q) + '</p>');
+      addMsg('user', '<p>' + escapeHtml(q) + '</p>');
       input.value = '';
+
       if (!ready) {
-        addMsg(log, 'bot', '<p>База ещё загружается, секунду…</p>');
+        addMsg('bot', '<p>База ещё загружается, секунду…</p>');
         return;
       }
-      setTimeout(function () {
-        addMsg(log, 'bot', answer(q));
-      }, 120);
+
+      var hits = search(q, 3);
+      if (!hits.length) {
+        addMsg('bot', '<p>В базе нет подходящего материала. Уточните код ошибки или симптом.</p>');
+        return;
+      }
+
+      var thinking = addMsg('bot', '<p class="wa-thinking">Думаю…</p>');
+
+      askLLM(q, hits)
+        .then(function (text) {
+          thinking.innerHTML = renderAnswer(q, hits, text);
+          bindAnswerLinks(thinking);
+          log.scrollTop = log.scrollHeight;
+        })
+        .catch(function () {
+          thinking.innerHTML = renderAnswer(q, hits, null) +
+            '<p class="wa-answer__more">LLM недоступна — показан фрагмент из базы.</p>';
+          bindAnswerLinks(thinking);
+          log.scrollTop = log.scrollHeight;
+        });
     });
 
     fetch(KB_URL)
       .then(function (r) { return r.json(); })
       .then(buildIndex)
       .catch(function () {
-        addMsg(log, 'bot', '<p>Не удалось загрузить базу знаний.</p>');
+        addMsg('bot', '<p>Не удалось загрузить базу знаний.</p>');
       });
   }
 

@@ -82,6 +82,7 @@
       display: flex; justify-content: space-between; align-items: center;
       padding: .9rem 1rem; border-bottom: 1px solid rgba(167,139,250,.18);
     }
+    .wa-head__drag { cursor: move; user-select: none; flex: 1; }
     .wa-head strong { font-size: .95rem; }
     .wa-head__sub { display: block; font-size: .72rem; color: var(--color-muted); margin-top: .1rem; }
     .wa-close { background: none; border: none; color: var(--color-muted); font-size: 1.4rem; cursor: pointer; line-height: 1; }
@@ -95,6 +96,46 @@
     .wa-answer__section { color: var(--color-violet-light); font-size: .8rem; }
     .wa-answer__body { color: var(--color-text); font-size: .85rem; }
     .wa-answer__src, .wa-answer__more { color: var(--color-muted); font-size: .75rem; margin-top: .5rem; }
+    .wa-answer__link {
+      display: block; width: 100%; margin-top: .6rem; padding: .5rem .7rem;
+      border-radius: 8px; border: 1px solid rgba(52,211,153,.35);
+      background: rgba(52,211,153,.08); color: var(--color-green);
+      font-size: .8rem; font-weight: 600; text-align: left; cursor: pointer;
+      font-family: inherit;
+    }
+    .wa-answer__link:hover { background: rgba(52,211,153,.16); }
+    .wa-thinking { color: var(--color-muted); font-style: italic; }
+
+    /* --- модалка полного текста --- */
+    .wa-modal {
+      position: fixed; inset: 0; z-index: 100; display: none;
+      align-items: center; justify-content: center; padding: 1.5rem;
+      background: rgba(4,4,10,.72); backdrop-filter: blur(4px);
+    }
+    .wa-modal.is-open { display: flex; }
+    .wa-modal__box {
+      width: min(720px, 100%); max-height: 85vh; display: flex; flex-direction: column;
+      background: #12121f; border: 1px solid rgba(167,139,250,.28); border-radius: 16px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.6); overflow: hidden;
+    }
+    .wa-modal__head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 1.1rem 1.25rem; border-bottom: 1px solid rgba(167,139,250,.18);
+    }
+    .wa-modal__title { display: block; font-size: 1.05rem; color: var(--color-green); }
+    .wa-modal__sub { display: block; font-size: .78rem; color: var(--color-muted); margin-top: .2rem; }
+    .wa-modal__close {
+      background: none; border: none; color: var(--color-muted); font-size: 1.5rem;
+      cursor: pointer; line-height: 1; padding: 0 .2rem;
+    }
+    .wa-modal__body {
+      padding: 1.25rem; overflow-y: auto; white-space: pre-wrap;
+      font-size: .9rem; line-height: 1.7; color: var(--color-text);
+    }
+    .wa-modal__foot {
+      padding: .8rem 1.25rem; border-top: 1px solid rgba(167,139,250,.18);
+      font-size: .75rem; color: var(--color-muted);
+    }
     .wa-form { display: flex; gap: .5rem; padding: .75rem; border-top: 1px solid rgba(167,139,250,.18); }
     .wa-input {
       flex: 1; padding: .65rem .8rem; border-radius: 9px; border: 1px solid rgba(167,139,250,.25);
@@ -270,18 +311,5 @@
   </main>
 
   <script src="chat.js"></script>
-  <script>
-    (function () {
-      function openChat() {
-        var panel = document.querySelector('.wa-panel');
-        var input = document.querySelector('.wa-input');
-        if (panel) { panel.hidden = false; if (input) input.focus(); }
-      }
-      var a = document.getElementById('wa-open-chat');
-      var b = document.getElementById('wa-open-chat-2');
-      if (a) a.addEventListener('click', openChat);
-      if (b) b.addEventListener('click', openChat);
-    })();
-  </script>
 </body>
 </html>
